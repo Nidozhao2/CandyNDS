@@ -46,7 +46,41 @@
 inicializa_matriz:
 		push {lr}			@;guardar registros utilizados + link register
 		
+
+		mov r7, r0 @;guarda la direccio base de la matriu de joc
+
+
+		mul r1, r1, #ROWS	
+		mul r1, r1, #COLUMNS	@;R1 = desplazamiento del mapa de configuración
+		ldr r2, [r7, r1] @;direccio del mapa que volem jugar
+
+
+		mov r3, #0			@;R3 = contador de filas(inicialment 0)
+		mov r4, #0			@;R4 = contador de columna (inicialment 0)
 		
+		cmp r2, #0		@;comprobar si el tile es 0, 8 o 16 para generar
+		beq mod_random
+		cmp r2, #8
+		beq mod_random
+		cmp r2, #16
+		beq mod_random
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		cmp r3, #ROWS		@;comprobar si se han recorrido todas las filas
+		cmp r4, #COLUMNS	@;comprobar si se han recorrido todas las columnas 
+
+
 		pop {pc}			@;recuperar registros y retornar al invocador
 
 
@@ -92,10 +126,19 @@ recombina_elementos:
 @;		R0 = el número aleatorio dentro del rango especificado (0..n-1)
 	.global mod_random
 mod_random:
-		push {lr}
+		push {r1,lr}
 		
+		mov r1, r0 
+		bl random @;numero de 32 bits random en r0
+		lsr r0, #24
+		.lmod_random
+
+		cmp r0, r1
 		
-		pop {pc}
+		subhs r0, r0, r1
+		bhs .lmod_random
+
+		pop {r1,pc}
 
 
 
