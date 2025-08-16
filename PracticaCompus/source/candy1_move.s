@@ -41,7 +41,45 @@
 cuenta_repeticiones:
 		push {lr}
 		
+		ldr r4, [r0]
+
+
+		mul r0, r1, #ROWS
+		add r0, r2
+		@; per tant a r0 queda la direcció de memoria de la posició (f,c)
+
+		cmp r3, #1
+		beq .Lsur
+		blo .Leste
+		cmp r3, #2
+		beq .Loeste
 		
+		.Lnorte:
+		mov r5, #ROWS
+		rsb, r5,#0
+		b .Lend_cuenta_rep
+
+		.Leste:
+		mov r5, #1
+
+		.Lsur:
+		mov r5, #ROWS
+		b .Lend_cuenta_rep
+
+		.Loeste:
+		mov r5, #1
+		rsb, r5, #0
+	
+		.Lend_cuenta_rep:
+
+		mov r6, #0
+
+		ldr r7,[r0,r5]
+		cmp r4, r7
+		
+
+
+
 		pop {pc}
 
 

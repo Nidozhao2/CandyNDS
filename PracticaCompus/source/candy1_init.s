@@ -60,10 +60,10 @@ inicializa_matriz:
 
 
 		mov r5, #0			@;R5 = contador de columna (inicialment 0)
-		.lseguentfila
+		.lseguentfila:
 		mov r4, #0			@;R4 = contador de filas(inicialment 0)		
 
-		.lseguentcolumna
+		.lseguentcolumna:
 
 		cmp r2, #0		@;comprobar si el tile es 0, 8 o 16 para generar
 		beq mod_random
@@ -152,7 +152,7 @@ mod_random:
 		mov r1, r0 
 		bl random @;numero de 32 bits random en r0
 		lsr r0, #24
-		.lmod_random
+		.lmod_random:
 
 		cmp r0, r1
 		
