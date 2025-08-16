@@ -21,6 +21,7 @@
 
 
 
+
 @;-- .text. código de las rutinas ---
 .text	
 		.align 2
@@ -52,18 +53,39 @@ inicializa_matriz:
 
 		mul r1, r1, #ROWS	
 		mul r1, r1, #COLUMNS	@;R1 = desplazamiento del mapa de configuración
-		ldr r2, [r7, r1] @;direccio del mapa que volem jugar
-
-
-		mov r3, #0			@;R3 = contador de filas(inicialment 0)
-		mov r4, #0			@;R4 = contador de columna (inicialment 0)
 		
+		ldr r3,=mapas
+		ldr r2, [r3, r1] @;carguem el primer valor del mapa que volem jugar
+		
+
+
+		mov r5, #0			@;R5 = contador de columna (inicialment 0)
+		.lseguentfila
+		mov r4, #0			@;R4 = contador de filas(inicialment 0)		
+
+		.lseguentcolumna
+
 		cmp r2, #0		@;comprobar si el tile es 0, 8 o 16 para generar
 		beq mod_random
 		cmp r2, #8
 		beq mod_random
 		cmp r2, #16
 		beq mod_random
+
+
+		strb r0, [r7]
+
+		add r3, #1 @; movem un byte
+
+		add r4, #1
+		cmp r4, #ROWS		@;comprobar si se han recorrido todas las columnas
+		bne .lseguentfila
+		
+		add r5, #1 
+		cmp r5, #COLUMNS	@;comprobar si se han recorrido todas las filas
+		bne .lseguentcolumna
+		
+
 		
 		
 		
@@ -74,11 +96,6 @@ inicializa_matriz:
 		
 		
 		
-		
-		
-		
-		cmp r3, #ROWS		@;comprobar si se han recorrido todas las filas
-		cmp r4, #COLUMNS	@;comprobar si se han recorrido todas las columnas 
 
 
 		pop {pc}			@;recuperar registros y retornar al invocador
@@ -106,7 +123,11 @@ inicializa_matriz:
 recombina_elementos:
 		push {lr}
 		
-		
+
+
+
+
+
 		pop {pc}
 
 
