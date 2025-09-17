@@ -41,43 +41,76 @@
 cuenta_repeticiones:
 		push {lr}
 		
-		ldr r4, [r0]
 
+		sub r4, r1, #1   
+		mul r4, r4, #ROWS
+		add r0, r4, r2  @; obtenim la direccio del caramel (f,c)
+		
 
-		mul r0, r1, #ROWS
-		add r0, r2
+		mov r7, #3 @; r7 el número d'iteracions que s'han de fer cap a x costat
+		mov r8, #1  @; r8 tenim el contador de repetits, mínim 1
+
 		@; per tant a r0 queda la direcció de memoria de la posició (f,c)
 
-		cmp r3, #1
+		cmp r3, #1  @; comparem amb 1 per extreure el casos de orientació propis dels valors 0 i 1
 		beq .Lsur
 		blo .Leste
-		cmp r3, #2
+		cmp r3, #2 @; comparemb amb 2 per extreure el cas de 2(oest), en cas contrari tenim el 3 (nord)
 		beq .Loeste
 		
 		.Lnorte:
-		mov r5, #ROWS
-		rsb, r5,#0
-		b .Lend_cuenta_rep
+
+		cmp r1, #2
+		moveq r7, #2  @; cambiem r7 en cas de que el recorregut surti de rang
+		movlo r7, #1
+		mov r5, #ROWS 
+		rsb r5,r5,#0  @; r5 obté el valor que modificará r0 per cada iteració 
+
+		b .Lcuenta_rep
 
 		.Leste:
-		mov r5, #1
+		cmp r2, #2
+		moveq r7, #2  @; cambiem r7 en cas de que el recorregut surti de rang
+		movlo r7, #1
 
+		mov r5, #1 @; r5 obté el valor que modificará r0 per cada iteració 
+		b .Lcuenta_rep
 		.Lsur:
-		mov r5, #ROWS
-		b .Lend_cuenta_rep
+
+		cmp r1, #ROWS-1
+		moveq r7, #2   @; cambiem r7 en cas de que el recorregut surti de rang
+		movlo r7, #1
+		mov r5, #ROWS @; r5 obté el valor que modificará r0 per cada iteració
+		b .Lcuenta_rep
 
 		.Loeste:
-		mov r5, #1
-		rsb, r5, #0
+		cmp r2, #ROWS-1
+		moveq r7, #2   @; cambiem r7 en cas de que el recorregut surti de rang
+		movlo r7, #1
+		mov r5, #1 @; r5 obté el valor que modificará r0 per cada iteració 
+		rsb r5,r5, #0
 	
-		.Lend_cuenta_rep:
+		.Lcuenta_rep:
 
-		mov r6, #0
+		ldr r6,[r0,r5]  @;el valor que estem comprovant es troba a r6
 
-		ldr r7,[r0,r5]
-		cmp r4, r7
-		
+		.Lcaramel:   @; sustituible por mascaras??? to-do
+		cmp r6, #6
+		subhi r6, r6, #8  @; per la comprovació de repeticions fem servir el caramel que representa en lloc del real(gelatina)
+		bhi .Lcaramel
 
+		cmp r4, r6   @; comentario totalmente irrelevante 
+		addeq r8, #1
+		bne Lfi_cuenta
+
+		add r0, r0, r5 @; en cas de que tenim que tornar a iterar actualitzem r0 per al següent valor
+		sub r7,#1
+		cmp r7, #1
+		blo .Lcuenta_rep
+
+
+		.Lfi_cuenta:
+		mov r0, r8 @; finalment retornem el resultat per r0
 
 
 		pop {pc}
