@@ -39,15 +39,13 @@
 @;		R0 = número de repeticiones detectadas (mínimo 1)
 	.global cuenta_repeticiones
 cuenta_repeticiones:
-		push {lr}
-		
+		push {r1-r10,lr}
+		   
+		mul r4, r4, #COLUMNS
+		add r4, r4, r2  @; obtenim el offset del caramel (f,c) i el carreguem a r4
+		ldr r4, [r0, r4] 
 
-		sub r4, r1, #1   
-		mul r4, r4, #ROWS
-		add r0, r4, r2  @; obtenim la direccio del caramel (f,c)
-		
-
-		mov r7, #3 @; r7 el número d'iteracions que s'han de fer cap a x costat
+		mov r7, #2 @; r7 el número d'iteracions que s'han de fer cap a x costat
 		mov r8, #1  @; r8 tenim el contador de repetits, mínim 1
 
 		@; per tant a r0 queda la direcció de memoria de la posició (f,c)
@@ -59,43 +57,43 @@ cuenta_repeticiones:
 		beq .Loeste
 		
 		.Lnorte:
-
-		cmp r1, #2
-		moveq r7, #2  @; cambiem r7 en cas de que el recorregut surti de rang
-		movlo r7, #1
-		mov r5, #ROWS 
+		cmp r1, #1
+		moveq r7, #1  @; cambiem r7 en cas de que el recorregut surti de rang
+		blo .Lfi_cuenta
+		mov r5, #COLUMNS 
 		rsb r5,r5,#0  @; r5 obté el valor que modificará r0 per cada iteració 
 
 		b .Lcuenta_rep
 
-		.Leste:
-		cmp r2, #2
-		moveq r7, #2  @; cambiem r7 en cas de que el recorregut surti de rang
-		movlo r7, #1
-
+		.Leste:		
+		cmp r2, #COLUMNS-2
+		moveq r7, #1   @; cambiem r7 en cas de que el recorregut surti de rang
+		blo .Lfi_cuenta
 		mov r5, #1 @; r5 obté el valor que modificará r0 per cada iteració 
-		b .Lcuenta_rep
-		.Lsur:
+		rsb r5,r5, #0
 
-		cmp r1, #ROWS-1
-		moveq r7, #2   @; cambiem r7 en cas de que el recorregut surti de rang
-		movlo r7, #1
-		mov r5, #ROWS @; r5 obté el valor que modificará r0 per cada iteració
+		b .Lcuenta_rep
+
+		.Lsur:
+		cmp r1, #ROWS-2
+		moveq r7, #1   @; cambiem r7 en cas de que el recorregut surti de rang
+		blo .Lfi_cuenta
+		mov r5, #COLUMNS @; r5 obté el valor que modificará r0 per cada iteració
 		b .Lcuenta_rep
 
 		.Loeste:
-		cmp r2, #ROWS-1
-		moveq r7, #2   @; cambiem r7 en cas de que el recorregut surti de rang
-		movlo r7, #1
+		cmp r2, #1
+		moveq r7, #1  @; cambiem r7 en cas de que el recorregut surti de rang
+		blo .Lfi_cuenta
+
 		mov r5, #1 @; r5 obté el valor que modificará r0 per cada iteració 
-		rsb r5,r5, #0
 	
 		.Lcuenta_rep:
 
 		ldr r6,[r0,r5]  @;el valor que estem comprovant es troba a r6
 
-		.Lcaramel:   @; sustituible por mascaras??? to-do
-		cmp r6, #6
+		.Lcaramel:   @; sustituir por mascaras, 
+		cmp r6, #8
 		subhi r6, r6, #8  @; per la comprovació de repeticions fem servir el caramel que representa en lloc del real(gelatina)
 		bhi .Lcaramel
 
@@ -105,15 +103,15 @@ cuenta_repeticiones:
 
 		add r0, r0, r5 @; en cas de que tenim que tornar a iterar actualitzem r0 per al següent valor
 		sub r7,#1
-		cmp r7, #1
-		blo .Lcuenta_rep
+		cmp r7, #0
+		beq .Lcuenta_rep
 
 
 		.Lfi_cuenta:
 		mov r0, r8 @; finalment retornem el resultat per r0
 
 
-		pop {pc}
+		pop {r1-r10,pc}
 
 
 @;TAREA 1F;
