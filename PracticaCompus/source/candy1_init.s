@@ -45,7 +45,7 @@
 @;		R1 = número de mapa de configuración
 	.global inicializa_matriz
 inicializa_matriz:
-		push {lr}			@;guardar registros utilizados + link register
+		push {r2-r10,lr}			@;guardar registros utilizados + link register
 		
 
 		mov r7, r0 @;guarda la direccio base de la matriu de joc
@@ -58,8 +58,6 @@ inicializa_matriz:
 		ldr r3,=mapas
 		ldr r2, [r3, r1] @;carguem el primer valor del mapa que volem jugar
 		
-
-
 		mov r5, #0			@;R5 = contador de columna (inicialment 0)
 		.lseguentfila:
 		mov r4, #0			@;R4 = contador de filas(inicialment 0)		
@@ -99,7 +97,7 @@ inicializa_matriz:
 		
 
 
-		pop {pc}			@;recuperar registros y retornar al invocador
+		pop {r2-r10,pc}			@;recuperar registros y retornar al invocador
 
 
 @;TAREA 1B;
