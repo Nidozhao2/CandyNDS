@@ -1,2 +1,2 @@
 candy1_conf.o: \
- c:/Users/arvig/Desktop/candiNDS/CandyNDS/CandyNDS/PracticaCompus/source/candy1_conf.s
+ c:/Users/junco/Desktop/CandyNDS/PracticaCompus/source/candy1_conf.s
