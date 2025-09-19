@@ -40,8 +40,8 @@
 	.global cuenta_repeticiones
 cuenta_repeticiones:
 		push {r1-r10,lr}
-		   
-		mul r4, r4, #COLUMNS
+		mov r7, #COLUMNS
+		mul r4, r7, r4
 		add r4, r4, r2  @; obtenim el offset del caramel (f,c) i el carreguem a r4
 		ldr r4, [r0, r4] 
 
@@ -99,7 +99,7 @@ cuenta_repeticiones:
 
 		cmp r4, r6   @; comentario totalmente irrelevante 
 		addeq r8, #1
-		bne Lfi_cuenta
+		bne .Lfi_cuenta
 
 		add r0, r0, r5 @; en cas de que tenim que tornar a iterar actualitzem r0 per al següent valor
 		sub r7,#1

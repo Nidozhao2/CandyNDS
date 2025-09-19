@@ -50,9 +50,10 @@ inicializa_matriz:
 
 		mov r7, r0 @;guarda la direccio base de la matriu de joc
 
-
-		mul r1, r1, #ROWS	
-		mul r1, r1, #COLUMNS	@;R1 = desplazamiento del mapa de configuración
+		mov r2, #ROWS
+		mul r1, r2, r1	
+		mov r2, #COLUMNS
+		mul r1, r2, r1	@;R1 = desplazamiento del mapa de configuración
 		
 		ldr r3,=mapas
 		ldr r2, [r3, r1] @;carguem el primer valor del mapa que volem jugar
