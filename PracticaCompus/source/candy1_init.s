@@ -45,59 +45,53 @@
 @;		R1 = número de mapa de configuración
 	.global inicializa_matriz
 inicializa_matriz:
-		push {r2-r10,lr}			@;guardar registros utilizados + link register
+		push {r0-r10,lr}			@;guardar registros utilizados + link register
 		
-
 		mov r7, r0 @;guarda la direccio base de la matriu de joc
 
+		mov r0, #COLUMNS
 		mov r2, #ROWS
-		mul r1, r2, r1	
-		mov r2, #COLUMNS
-		mul r1, r2, r1	@;R1 = desplazamiento del mapa de configuración
-		
+		mul r0, r2, r0
+		mul r1, r0, r1
+
 		ldr r3,=mapas
-		ldr r2, [r3, r1] @;carguem el primer valor del mapa que volem jugar
+
 		
+
+
 		mov r5, #0			@;R5 = contador de columna (inicialment 0)
 		.lseguentfila:
 		mov r4, #0			@;R4 = contador de filas(inicialment 0)		
 
 		.lseguentcolumna:
 
-		cmp r2, #0		@;comprobar si el tile es 0, 8 o 16 para generar
-		beq mod_random
-		cmp r2, #8
-		beq mod_random
-		cmp r2, #16
-		beq mod_random
+		ldr r6, [r3, r1] @;carguem el primer valor del mapa que volem jugar
+		add r1, r1, #1 @; movem un byte
+
+		mov r0, #6 @; per a obtenir numero entre 0-5
+		cmp r6, #0		@;comprobar si el tile es 0, 8 o 16 para generar
+		bleq mod_random
+		cmp r6, #8
+		bleq mod_random
+		cmp r6, #16
+		bleq mod_random
+
+		add r0, r0, #1
 
 
 		strb r0, [r7]
+		add r7, #1 @; movem un byte
 
-		add r3, #1 @; movem un byte
-
-		add r4, #1
-		cmp r4, #ROWS		@;comprobar si se han recorrido todas las columnas
-		bne .lseguentfila
 		
-		add r5, #1 
-		cmp r5, #COLUMNS	@;comprobar si se han recorrido todas las filas
+		add r4, #1
+		cmp r4, #COLUMNS		@;comprobar si se han recorrido todas las columnas
 		bne .lseguentcolumna
 		
+		add r5, #1 
+		cmp r5, #ROWS	@;comprobar si se han recorrido todas las filas
+		bne .lseguentfila
 
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-
-
-		pop {r2-r10,pc}			@;recuperar registros y retornar al invocador
+		pop {r0-r10,pc}			@;recuperar registros y retornar al invocador
 
 
 @;TAREA 1B;
@@ -146,19 +140,22 @@ recombina_elementos:
 @;		R0 = el número aleatorio dentro del rango especificado (0..n-1)
 	.global mod_random
 mod_random:
-		push {r1,lr}
+		push {r1,r2,lr}
 		
 		mov r1, r0 
 		bl random @;numero de 32 bits random en r0
-		lsr r0, #24
+
+		mov r2, #0xff
+		and r0, r0, r2
+		
 		.lmod_random:
 
 		cmp r0, r1
 		
-		subhs r0, r0, r1
+		subhs r0, r0, r1 @; r1-r0, bucle fins q r0<r1
 		bhs .lmod_random
 
-		pop {r1,pc}
+		pop {r1,r2,pc}
 
 
 
@@ -186,3 +183,5 @@ random:
 
 
 .end
+
+
