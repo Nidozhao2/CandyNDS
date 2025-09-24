@@ -147,7 +147,7 @@ mod_random:
 
 		mov r2, #0xff
 		and r0, r0, r2
-		
+		 
 		.lmod_random:
 
 		cmp r0, r1
