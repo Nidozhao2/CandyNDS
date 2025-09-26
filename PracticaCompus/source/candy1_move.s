@@ -40,14 +40,18 @@
 	.global cuenta_repeticiones
 cuenta_repeticiones:
 		push {r1-r10,lr}
-		mov r7, #COLUMNS
-		mul r4, r7, r4
-		add r4, r4, r2  @; obtenim el offset del caramel (f,c) i el carreguem a r4
+
+		mov r4, #COLUMNS
+		mla r4, r1, r4, r2 
+
+
+
 		ldr r4, [r0, r4] 
 
 		mov r7, #2 @; r7 el número d'iteracions que s'han de fer cap a x costat
 		mov r8, #1  @; r8 tenim el contador de repetits, mínim 1
 
+		mov r0, r4
 		@; per tant a r0 queda la direcció de memoria de la posició (f,c)
 
 		cmp r3, #1  @; comparem amb 1 per extreure el casos de orientació propis dels valors 0 i 1
@@ -68,7 +72,7 @@ cuenta_repeticiones:
 		.Leste:		
 		cmp r2, #COLUMNS-2
 		moveq r7, #1   @; cambiem r7 en cas de que el recorregut surti de rang
-		blo .Lfi_cuenta
+		bhi .Lfi_cuenta
 		mov r5, #1 @; r5 obté el valor que modificará r0 per cada iteració 
 		rsb r5,r5, #0
 
@@ -77,7 +81,7 @@ cuenta_repeticiones:
 		.Lsur:
 		cmp r1, #ROWS-2
 		moveq r7, #1   @; cambiem r7 en cas de que el recorregut surti de rang
-		blo .Lfi_cuenta
+		bhi .Lfi_cuenta
 		mov r5, #COLUMNS @; r5 obté el valor que modificará r0 per cada iteració
 		b .Lcuenta_rep
 
@@ -93,15 +97,17 @@ cuenta_repeticiones:
 		ldr r6,[r0,r5]  @;el valor que estem comprovant es troba a r6
 
 		.Lcaramel:   @; sustituir por mascaras, 
-		cmp r6, #8
-		subhi r6, r6, #8  @; per la comprovació de repeticions fem servir el caramel que representa en lloc del real(gelatina)
-		bhi .Lcaramel
 
-		cmp r4, r6   @; comentario totalmente irrelevante 
+
+		mov r7, #7
+		and r6, r6, r7
+		cmp r6, r0
+
+
 		addeq r8, #1
 		bne .Lfi_cuenta
 
-		add r0, r0, r5 @; en cas de que tenim que tornar a iterar actualitzem r0 per al següent valor
+		add r5, r5, r5 @; en cas de que tenim que tornar a iterar actualitzem r0 per al següent valor
 		sub r7,#1
 		cmp r7, #0
 		beq .Lcuenta_rep

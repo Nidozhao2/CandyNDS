@@ -45,17 +45,18 @@
 @;		R1 = número de mapa de configuración
 	.global inicializa_matriz
 inicializa_matriz:
-		push {r0-r10,lr}			@;guardar registros utilizados + link register
+		push {r0-r11,lr}			@;guardar registros utilizados + link register
 		
 		mov r7, r0 @;guarda la direccio base de la matriu de joc
 
 		mov r0, #COLUMNS
 		mov r2, #ROWS
 		mul r0, r2, r0
-		mul r5, r0, r1
+		mul r5, r0, r1 @; offset del mapa que juguem
 
-		ldr r4,=mapas
+		ldr r4,=mapas @; direccio on comença la configuracio de mapes
 
+		mov r8, #0 @; offset per la direccio base de la matriu
 
 		mov r2, #0			@;R5 = contador de columna (inicialment 0)
 		.lseguentfila:
@@ -63,15 +64,12 @@ inicializa_matriz:
 
 		.lseguentcolumna:
 
-		ldr r6, [r4, r5] @;carguem el primer valor del mapa que volem jugar
+		ldr r6, [r4, r5] @;primer valor del mapa que volem jugar
 		add r5, r5, #1 @; movem un byte
 
 
-		
-
-
 		.Lgenerar_caramel:   @; mejora necesaria: cambiarlo por mascaras
-		mov r0, #6 @; per a obtenir numero entre 0-5
+		mov r0, #6 @; per a obtenir numero entre 0-5 
 		cmp r6, #0		@;comprobar si el tile es 0, 8 o 16 para generar
 		bleq mod_random
 		cmp r6, #8
@@ -79,20 +77,57 @@ inicializa_matriz:
 		cmp r6, #16
 		bleq mod_random
 
-		add r0, r0, #1
+		addeq r0, r0, #1
+
+
+		mov r10 , #0 @; contador de horizontales (este-oeste)
+		mov r11, #0 @; contador verticales (norte-sur)
+
+
+		addeq r0, r6, r0
+		strb r0, [r7,r8]
+
 
 		.Lcomprobar_repetits:
 		mov r3, #0
-		
+		mov r0, r7
+
+		bl cuenta_repeticiones
+
+
+		cmp r3, #0
+		add r3, #2
+		addeq r10, r10, r0
+		b .Lcomprobar_repetits
 
 		
+		cmp r3, #1
+		add r3, #1
+		addeq r11, r11, r0
+		b .Lcomprobar_repetits
 		
+		cmp r3, #2
+		add r3, #2
+		addeq r10, r10, r0
+		b .Lcomprobar_repetits
+		
+		cmp r3, #3		
+		add r3, #1
+		addeq r11, r11, r0
+		b .Lcomprobar_repetits
+
+		sub r10, r10, #2
+		sub r11, r11, #2
+
+		cmp r10, #3
+		bhs .Lgenerar_caramel
+		cmp r11, #3
+		bhs .Lgenerar_caramel
 
 
 
 
-		strb r0, [r7]
-		add r7, #1 @; movem un byte
+		add r8, #1 @; movem un byte
 
 		
 		add r1, #1
@@ -103,7 +138,7 @@ inicializa_matriz:
 		cmp r2, #ROWS	@;comprobar si se han recorrido todas las filas
 		bne .lseguentfila
 
-		pop {r0-r10,pc}			@;recuperar registros y retornar al invocador
+		pop {r0-r11,pc}			@;recuperar registros y retornar al invocador
 
 
 @;TAREA 1B;
