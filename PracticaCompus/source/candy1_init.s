@@ -57,8 +57,6 @@ inicializa_matriz:
 		ldr r3,=mapas
 
 		
-
-
 		mov r5, #0			@;R5 = contador de columna (inicialment 0)
 		.lseguentfila:
 		mov r4, #0			@;R4 = contador de filas(inicialment 0)		
