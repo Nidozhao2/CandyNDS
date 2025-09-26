@@ -52,20 +52,25 @@ inicializa_matriz:
 		mov r0, #COLUMNS
 		mov r2, #ROWS
 		mul r0, r2, r0
-		mul r1, r0, r1
+		mul r5, r0, r1
 
-		ldr r3,=mapas
+		ldr r4,=mapas
 
-		
-		mov r5, #0			@;R5 = contador de columna (inicialment 0)
+
+		mov r2, #0			@;R5 = contador de columna (inicialment 0)
 		.lseguentfila:
-		mov r4, #0			@;R4 = contador de filas(inicialment 0)		
+		mov r1, #0			@;R4 = contador de filas(inicialment 0)		
 
 		.lseguentcolumna:
 
-		ldr r6, [r3, r1] @;carguem el primer valor del mapa que volem jugar
-		add r1, r1, #1 @; movem un byte
+		ldr r6, [r4, r5] @;carguem el primer valor del mapa que volem jugar
+		add r5, r5, #1 @; movem un byte
 
+
+		
+
+
+		.Lgenerar_caramel:   @; mejora necesaria: cambiarlo por mascaras
 		mov r0, #6 @; per a obtenir numero entre 0-5
 		cmp r6, #0		@;comprobar si el tile es 0, 8 o 16 para generar
 		bleq mod_random
@@ -76,17 +81,26 @@ inicializa_matriz:
 
 		add r0, r0, #1
 
+		.Lcomprobar_repetits:
+		mov r3, #0
+		
+
+		
+		
+
+
+
 
 		strb r0, [r7]
 		add r7, #1 @; movem un byte
 
 		
-		add r4, #1
-		cmp r4, #COLUMNS		@;comprobar si se han recorrido todas las columnas
+		add r1, #1
+		cmp r1, #COLUMNS		@;comprobar si se han recorrido todas las columnas
 		bne .lseguentcolumna
 		
-		add r5, #1 
-		cmp r5, #ROWS	@;comprobar si se han recorrido todas las filas
+		add r2, #1 
+		cmp r2, #ROWS	@;comprobar si se han recorrido todas las filas
 		bne .lseguentfila
 
 		pop {r0-r10,pc}			@;recuperar registros y retornar al invocador
