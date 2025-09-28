@@ -39,20 +39,20 @@
 @;		R0 = número de repeticiones detectadas (mínimo 1)
 	.global cuenta_repeticiones
 cuenta_repeticiones:
-		push {r1-r10,lr}
+		push {r1-r11,lr}
 
 		mov r4, #COLUMNS
 		mla r4, r1, r4, r2 
-
-
+		add r11, r0, r4
 
 		ldr r4, [r0, r4] 
+
+		@; per tant a r4 queda el valor del caramel a (f, c) i a r11 queda la seva direcció
 
 		mov r7, #2 @; r7 el número d'iteracions que s'han de fer cap a x costat
 		mov r8, #1  @; r8 tenim el contador de repetits, mínim 1
 
-		mov r0, r4
-		@; per tant a r0 queda la direcció de memoria de la posició (f,c)
+	
 
 		cmp r3, #1  @; comparem amb 1 per extreure el casos de orientació propis dels valors 0 i 1
 		beq .Lsur
@@ -94,14 +94,14 @@ cuenta_repeticiones:
 	
 		.Lcuenta_rep:
 
-		ldr r6,[r0,r5]  @;el valor que estem comprovant es troba a r6
+		ldr r6,[r11,r5]  @;el valor que estem comprovant es troba a r6
 
 		.Lcaramel:   @; sustituir por mascaras, 
 
 
-		mov r7, #7
-		and r6, r6, r7
-		cmp r6, r0
+		mov r9, #7
+		and r6, r6, r9
+		cmp r6, r4
 
 
 		addeq r8, #1
@@ -110,14 +110,14 @@ cuenta_repeticiones:
 		add r5, r5, r5 @; en cas de que tenim que tornar a iterar actualitzem r0 per al següent valor
 		sub r7,#1
 		cmp r7, #0
-		beq .Lcuenta_rep
+		bne .Lcuenta_rep
 
 
 		.Lfi_cuenta:
 		mov r0, r8 @; finalment retornem el resultat per r0
 
 
-		pop {r1-r10,pc}
+		pop {r1-r11,pc}
 
 
 @;TAREA 1F;

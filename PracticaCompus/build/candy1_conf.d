@@ -1,2 +1,1 @@
-candy1_conf.o: \
- c:/Users/junco/Desktop/CandyNDS/PracticaCompus/source/candy1_conf.s
+candy1_conf.o: c:/URV/CandyNDS/PracticaCompus/source/candy1_conf.s
