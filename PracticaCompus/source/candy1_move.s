@@ -44,15 +44,12 @@ cuenta_repeticiones:
 		mov r4, #COLUMNS
 		mla r4, r1, r4, r2 
 
+		ldrb r4, [r0, r4] 
 
-
-		ldr r4, [r0, r4] 
-
-		mov r7, #2 @; r7 el número d'iteracions que s'han de fer cap a x costat
 		mov r8, #1  @; r8 tenim el contador de repetits, mínim 1
 
-		mov r0, r4
-		@; per tant a r0 queda la direcció de memoria de la posició (f,c)
+
+		@; per tant a r0 queda el valor de la posició (f,c)
 
 		cmp r3, #1  @; comparem amb 1 per extreure el casos de orientació propis dels valors 0 i 1
 		beq .Lsur
@@ -61,56 +58,59 @@ cuenta_repeticiones:
 		beq .Loeste
 		
 		.Lnorte:
-		cmp r1, #1
-		moveq r7, #1  @; cambiem r7 en cas de que el recorregut surti de rang
-		blo .Lfi_cuenta
+		 
+
+
+		
+		mov r7, r1
 		mov r5, #COLUMNS 
-		rsb r5,r5,#0  @; r5 obté el valor que modificará r0 per cada iteració 
+		rsb r5,r5,#0  @; r5 obté el offser per iteració 
 
 		b .Lcuenta_rep
 
 		.Leste:		
-		cmp r2, #COLUMNS-2
-		moveq r7, #1   @; cambiem r7 en cas de que el recorregut surti de rang
-		bhi .Lfi_cuenta
-		mov r5, #1 @; r5 obté el valor que modificará r0 per cada iteració 
-		rsb r5,r5, #0
+
+
+		mov r6, #COLUMNS-1
+		sub r7, r6, r2
+
+		mov r5, #1 @; r5 obté el offser per iteració 
+
 
 		b .Lcuenta_rep
 
 		.Lsur:
-		cmp r1, #ROWS-2
-		moveq r7, #1   @; cambiem r7 en cas de que el recorregut surti de rang
-		bhi .Lfi_cuenta
-		mov r5, #COLUMNS @; r5 obté el valor que modificará r0 per cada iteració
+
+
+		mov r6, #ROWS-1
+		sub r7, r6, r1
+
+
+		mov r5, #COLUMNS @; r5 obté el offser per iteració 
 		b .Lcuenta_rep
 
 		.Loeste:
-		cmp r2, #1
-		moveq r7, #1  @; cambiem r7 en cas de que el recorregut surti de rang
-		blo .Lfi_cuenta
 
-		mov r5, #1 @; r5 obté el valor que modificará r0 per cada iteració 
+		mov r7, r2		
+		rsb r5,r5, #0
+		mov r5, #1  @; r5 obté el offser per iteració 
 	
 		.Lcuenta_rep:
 
-		ldr r6,[r0,r5]  @;el valor que estem comprovant es troba a r6
+		add r0, r0, r5
+		ldrb r6, [r0]  @;el valor que estem comprovant es troba a r6
 
-		.Lcaramel:   @; sustituir por mascaras, 
+		mov r9, #7
+		and r6, r6, r9
 
-
-		mov r7, #7
-		and r6, r6, r7
-		cmp r6, r0
-
-
+		cmp r6, r4
 		addeq r8, #1
 		bne .Lfi_cuenta
 
-		add r5, r5, r5 @; en cas de que tenim que tornar a iterar actualitzem r0 per al següent valor
+		
 		sub r7,#1
 		cmp r7, #0
-		beq .Lcuenta_rep
+		bne .Lcuenta_rep
 
 
 		.Lfi_cuenta:

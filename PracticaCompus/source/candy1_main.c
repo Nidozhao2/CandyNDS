@@ -445,11 +445,11 @@ void procesa_sugerencia(char mat[][COLUMNS], unsigned short lap)
 /* candy1_main.c : función principal main() para test de tarea 1E 	*/
 /* ---------------------------------------------------------------- */
 #define NUMTESTS 14
-short nmap[] = {4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 8};
-short posX[] = {0, 0, 0, 0, 4, 4, 4, 0, 0, 5, 4, 1, 1, 1};
-short posY[] = {2, 2, 2, 2, 4, 4, 4, 0, 0, 0, 4, 3, 3, 5};
-short cori[] = {0, 1, 2, 3, 0, 1, 2, 0, 3, 0, 0, 1, 3, 0};
-short resp[] = {1, 2, 1, 1, 2, 1, 1, 3, 1, 3, 5, 2, 4, 2};
+short nmap[] = { 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 8};
+short posX[] = { 0, 0, 0, 4, 4, 4, 0, 0, 5, 4, 1, 1, 1};
+short posY[] = { 2, 2, 2, 4, 4, 4, 0, 0, 0, 4, 3, 3, 5};
+short cori[] = { 1, 2, 3, 0, 1, 2, 0, 3, 0, 0, 1, 3, 0};
+short resp[] = { 2, 1, 1, 2, 1, 1, 3, 1, 3, 5, 2, 4, 2};
 
 int main(void)
 {
