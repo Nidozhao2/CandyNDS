@@ -44,7 +44,13 @@ cuenta_repeticiones:
 		mov r4, #COLUMNS
 		mla r4, r1, r4, r2 
 
-		ldrb r4, [r0, r4] 
+		add r0, r0, r4
+
+		ldrb r4, [r0] 
+
+		mov r9, #7  @; carreguem la mascara 
+		and r4, r4, r9
+
 
 		mov r8, #1  @; r8 tenim el contador de repetits, mínim 1
 
@@ -91,17 +97,19 @@ cuenta_repeticiones:
 
 		.Loeste:
 
-		mov r7, r2		
+		mov r7, r2	
+		mov r5, #1  @; r5 obté el offser per iteració 	
 		rsb r5,r5, #0
-		mov r5, #1  @; r5 obté el offser per iteració 
+		
 	
 		.Lcuenta_rep:
 
 		add r0, r0, r5
 		ldrb r6, [r0]  @;el valor que estem comprovant es troba a r6
 
-		mov r9, #7
-		and r6, r6, r9
+
+		and r6, r6, r9  @; apliquem la mascara que ens compara els 3 bits inferiors
+
 
 		cmp r6, r4
 		addeq r8, #1
