@@ -161,14 +161,84 @@ inicializa_matriz:
 @;		R0 = dirección base de la matriz de juego
 	.global recombina_elementos
 recombina_elementos:
-		push {lr}
+		push {r0-r7, lr}
 		
+		mov r7, r0 				@; conservem direcció base de memòria a r7
+
+		@; Còpia de la matriu de joc 
+		ldr r1, =mat_recomb1 	@; r1 = adreça de mat_recomb1[][]
+		ldr r2, =mat_recomb2 	@; r2 = adreça de mat_recomb2[][]
+
+		.Linici_recomb:
+		mov r3, #0 @; r2 = index
+
+		.Lcopia_matriu:
+			ldr r4, [r7, r3]  	@; r4 = element de la matriu base per copiar
+			and r5, r4, #0x07 	@; r5 = últims tres bits de l'element (element a copiar sense gelatines)
+			cmp r5, #0x07
+			moveq r5, #0 		@; si l'element és sòlid o forat es guarda un 0
+			strb r5, [r1, r3] 	@; guardem l'element a la matriu mat_recomb1[][]
+
+			add r3, #1
+			cmp r3, #ROWS*#COLUMNS
+			blo .Lcopia_matriu
+
+		mov r3, #0
+
+		.Lrecombinacio:
+			ldr r4, [r7, r3]
+			and r5, r4, #0x07
+			cmp r5, #0			@; si l'element de la matriu base és buida, forat o sòlid ignorem
+			beq .Lseguent_iteracio
+			cmp r5, #7
+			beq .Lseguent_iteracio
+
+			mov r6, r4, lsr #3	
+			and r6, #0x03		@; r6 = codi de gelatina de la casella
+
+			.Lcasella_aleatoria:
+				mov r0, #ROWS*COLUMNS
+				b mod_random
+				ldr r4, [r1, r0] 	@; obtenir posició aleatòria de mat_recomb1[][]
+				cmp r4, #0
+				beq .Lcasella_aleatoria @; torna a intentar si la posició conté un 0
+
+			@; afegim el codi de la gelatina de la casella
+			cmp r6, #2
+			addeq r4, #16
+			cmpne r6, #1
+			addeq r4, #8
+
+			strb r4, [r2, r3]
+
+			mov r0, r2
+			b hay_secuencia
+			cmp r0, #1
+			beq .Lrecombinacio	@; torna a intentar amb altre element si forma secuència
+
+			mov r5, #0
+			strb r5, [r1, r0]	@; fixem 0 a la posició visitada de mat_recomb1[][]
+
+			.seguent_iteracio:
+				add r3, #1
+				cmp r3, #ROWS*#COLUMNS
+				blo .Lrecombinacio
+
+			@; TODO: Falta revisar si es imposible recombinar sin generar una secuencia en las últimas casillas
+		
+		@; Còpia de mat_recomb2[][] a r0
+		mov r3, #0
+		.Lcopia_final:
+			ldr r4, [r2, r3]
+			strb r4, [r7, r3]
+			add r3, #1
+			cmp r3, #ROWS*#COLUMNS
+			blo .Lcopia_final
+		
+		mov r0, r7	@; retornem la direcció de la matriu base a r0
 
 
-
-
-
-		pop {pc}
+		pop {r0-r7, pc}
 
 
 

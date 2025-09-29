@@ -1,5 +1,4 @@
-candy1_main.o: \
- c:/Users/junco/Desktop/CandyNDS/PracticaCompus/source/candy1_main.c \
+candy1_main.o: c:/URV/CandyNDS/PracticaCompus/source/candy1_main.c \
  c:/URV/bmde/devkitPro/libnds/include/nds.h \
  c:/URV/bmde/devkitPro/libnds/include/nds/libversion.h \
  c:/URV/bmde/devkitPro/libnds/include/nds/ndstypes.h \
@@ -59,7 +58,7 @@ candy1_main.o: \
  c:/URV/bmde/devkitPro/libnds/include/nds/arm9/video.h \
  c:/URV/bmde/devkitPro/libnds/include/nds/arm9/videoGL.h \
  c:/URV/bmde/devkitPro/libnds/include/nds/arm9/nand.h \
- c:/Users/junco/Desktop/CandyNDS/PracticaCompus/include/candy1_incl.h
+ c:/URV/CandyNDS/PracticaCompus/include/candy1_incl.h
 
 c:/URV/bmde/devkitPro/libnds/include/nds.h:
 
@@ -179,4 +178,4 @@ c:/URV/bmde/devkitPro/libnds/include/nds/arm9/videoGL.h:
 
 c:/URV/bmde/devkitPro/libnds/include/nds/arm9/nand.h:
 
-c:/Users/junco/Desktop/CandyNDS/PracticaCompus/include/candy1_incl.h:
+c:/URV/CandyNDS/PracticaCompus/include/candy1_incl.h:

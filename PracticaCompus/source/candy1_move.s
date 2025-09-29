@@ -39,7 +39,7 @@
 @;		R0 = número de repeticiones detectadas (mínimo 1)
 	.global cuenta_repeticiones
 cuenta_repeticiones:
-		push {r1-r10,lr}
+		push {r1-r11,lr}
 
 		mov r4, #COLUMNS
 		mla r4, r1, r4, r2 
@@ -125,7 +125,7 @@ cuenta_repeticiones:
 		mov r0, r8 @; finalment retornem el resultat per r0
 
 
-		pop {r1-r10,pc}
+		pop {r1-r11,pc}
 
 
 @;TAREA 1F;
