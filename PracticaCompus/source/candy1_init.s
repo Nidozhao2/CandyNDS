@@ -58,9 +58,9 @@ inicializa_matriz:
 
 		mov r8, #0 @; offset per la direccio base de la matriu
 
-		mov r2, #0			@;R5 = contador de columna (inicialment 0)
+		mov r1, #0			@;R5 = contador de columna (inicialment 0)
 		.lseguentfila:
-		mov r1, #0			@;R4 = contador de filas(inicialment 0)		
+		mov r2, #0			@;R4 = contador de filas(inicialment 0)		
 
 		.lseguentcolumna:
 
@@ -70,13 +70,12 @@ inicializa_matriz:
 
 		.Lgenerar_caramel:   @; mejora necesaria: cambiarlo por mascaras
 		mov r0, #6 @; per a obtenir numero entre 0-5 
+		
+		and r6, r6, #7
+
 		cmp r6, #0		@;comprobar si el tile es 0, 8 o 16 para generar
 		bleq mod_random
-		cmp r6, #8
-		bleq mod_random
-		cmp r6, #16
-		bleq mod_random
-
+		cmp r6, #0 @; tornem a comprobar per si hem perdut el flag
 		addeq r0, r0, #1
 
 
@@ -84,41 +83,27 @@ inicializa_matriz:
 		mov r11, #0 @; contador verticales (norte-sur)
 
 
-		addeq r0, r6, r0
+
 		strb r0, [r7,r8]
 
 
-		.Lcomprobar_repetits:
-		mov r3, #0
-		mov r0, r7
 
-		bl cuenta_repeticiones
-
-
-		cmp r3, #0
-		add r3, #2
-		addeq r10, r10, r0
-		b .Lcomprobar_repetits
-
+@; el error se encuentra en comprobar_repetits
+		mov r3, #2
 		
-		cmp r3, #1
-		add r3, #1
-		addeq r11, r11, r0
-		b .Lcomprobar_repetits
+		.Lcomprobar_repetits:
+
+		mov r0, r7 @; movem a r0 la direccio de memoria
+		bl cuenta_repeticiones
 		
 		cmp r3, #2
-		add r3, #2
+		addeq r3, #1
 		addeq r10, r10, r0
-		b .Lcomprobar_repetits
+		beq .Lcomprobar_repetits
 		
 		cmp r3, #3		
-		add r3, #1
 		addeq r11, r11, r0
-		b .Lcomprobar_repetits
-
-		sub r10, r10, #2
-		sub r11, r11, #2
-
+		
 		cmp r10, #3
 		bhs .Lgenerar_caramel
 		cmp r11, #3
@@ -128,14 +113,11 @@ inicializa_matriz:
 
 
 		add r8, #1 @; movem un byte
-
-		
-		add r1, #1
-		cmp r1, #COLUMNS		@;comprobar si se han recorrido todas las columnas
+		add r2, r2,#1
+		cmp r2, #COLUMNS		@;comprobar si se han recorrido todas las columnas
 		bne .lseguentcolumna
-		
-		add r2, #1 
-		cmp r2, #ROWS	@;comprobar si se han recorrido todas las filas
+		add r1, r1 ,#1 
+		cmp r1, #ROWS	@;comprobar si se han recorrido todas las filas
 		bne .lseguentfila
 
 		pop {r0-r11,pc}			@;recuperar registros y retornar al invocador
@@ -162,7 +144,7 @@ inicializa_matriz:
 	.global recombina_elementos
 recombina_elementos:
 		push {r0-r7, lr}
-		
+/*		
 		mov r7, r0 				@; conservem direcció base de memòria a r7
 
 		@; Còpia de la matriu de joc 
@@ -180,7 +162,7 @@ recombina_elementos:
 			strb r5, [r1, r3] 	@; guardem l'element a la matriu mat_recomb1[][]
 
 			add r3, #1
-			cmp r3, #ROWS*#COLUMNS
+			cmp r3, #ROWS*COLUMNS
 			blo .Lcopia_matriu
 
 		mov r3, #0
@@ -219,9 +201,9 @@ recombina_elementos:
 			mov r5, #0
 			strb r5, [r1, r0]	@; fixem 0 a la posició visitada de mat_recomb1[][]
 
-			.seguent_iteracio:
+			.Lseguent_iteracio:
 				add r3, #1
-				cmp r3, #ROWS*#COLUMNS
+				cmp r3, #ROWS*COLUMNS
 				blo .Lrecombinacio
 
 			@; TODO: Falta revisar si es imposible recombinar sin generar una secuencia en las últimas casillas
@@ -232,12 +214,12 @@ recombina_elementos:
 			ldr r4, [r2, r3]
 			strb r4, [r7, r3]
 			add r3, #1
-			cmp r3, #ROWS*#COLUMNS
+			cmp r3, #ROWS*COLUMNS
 			blo .Lcopia_final
 		
 		mov r0, r7	@; retornem la direcció de la matriu base a r0
 
-
+ */
 		pop {r0-r7, pc}
 
 
@@ -255,26 +237,31 @@ recombina_elementos:
 @;		R0 = el rango del número aleatorio (n)
 @;	Resultado:
 @;		R0 = el número aleatorio dentro del rango especificado (0..n-1)
+
 	.global mod_random
 mod_random:
-		push {r1,r2,lr}
+		push {r2-r4, lr}
 		
-		mov r1, r0 
-		bl random @;numero de 32 bits random en r0
-
-		mov r2, #0xff
-		and r0, r0, r2
-		 
-		.lmod_random:
-
-		cmp r0, r1
+		cmp r0, #2				@;compara el rango de entrada con el mínimo
+		movlo r0, #2			@;si menor, fija el rango mínimo
+		cmp r0, #0xFF			@;compara el rango de entrada con el máximo
+		movhi r0, #0xFF			@;si mayor, fija el rango máximo
+		sub r2, r0, #1			@;R2 = R0-1 (número más alto permitido)
+		mov r3, #1				@;R3 = máscara de bits
+	.Lmodran_forbits:
+		mov r3, r3, lsl #1
+		orr r3, #1				@;inyecta otro bit
+		cmp r3, r2				@;genera una máscara superior al rango requerido
+		blo .Lmodran_forbits
 		
-		subhs r0, r0, r1 @; r1-r0, bucle fins q r0<r1
-		bhs .lmod_random
-
-		pop {r1,r2,pc}
-
-
+	.Lmodran_loop:
+		bl random				@;R0 = número aleatorio de 32 bits
+		and r4, r0, r3			@;filtra los bits de menos peso según máscara
+		cmp r4, r2				@;si resultado superior al permitido,
+		bhi .Lmodran_loop		@; repite el proceso
+		mov r0, r4
+		
+		pop {r2-r4, pc}
 
 @; random(): rutina para obtener un número aleatorio de 32 bits, a partir de
 @;	otro valor aleatorio almacenado en la variable global seed32 (declarada
