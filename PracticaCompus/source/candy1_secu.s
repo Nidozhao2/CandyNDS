@@ -58,7 +58,7 @@ hay_secuencia:
 		cmp r3, #0 		@;buit
 		beq .LSeguentPosi
 		cmp r3, #7		@;solido, hueco
-	
+		beq .LSeguentPosi
 
 		mov r6, #COLUMNS-2 @; anterior a la penultima
 		cmp r8, r6
@@ -93,7 +93,7 @@ hay_secuencia:
 		.Fi1:
 		mov r0, #1
 		.Fi:
-		pop {r1-r10,pc}
+		pop {r1-r12,pc}
 
 
 @;TAREA 1D;
