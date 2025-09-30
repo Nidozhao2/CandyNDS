@@ -22,6 +22,9 @@
 #define PUNT_COM7	300					// puntos combinación de 7 elementos
 
 
+#define MASK_GEL 0x07 					// Mascara per filtrar els valors buits 0, 8 i 16.
+
+
 	// candy1_conf.s //
 extern unsigned char max_mov[MAXLEVEL];		// movimientos máximos por nivel
 extern short pun_obj[MAXLEVEL];				// objetivo de puntos por nivel
