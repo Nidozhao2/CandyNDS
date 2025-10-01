@@ -440,43 +440,34 @@ void procesa_sugerencia(char mat[][COLUMNS], unsigned short lap)
 }
 
 
-
 /* ---------------------------------------------------------------- */
-/* candy1_main.c : función principal main() para test de tarea 1E 	*/
+/* candy1_main.c : función principal main() para test de tarea 1A 	*/
+/*					(requiere tener implementada la tarea 1E)		*/
 /* ---------------------------------------------------------------- */
-#define NUMTESTS 14
-short nmap[] = {4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 8};
-short posX[] = {0, 0, 0, 0, 4, 4, 4, 0, 0, 5, 4, 1, 1, 1};
-short posY[] = {2, 2, 2, 2, 4, 4, 4, 0, 0, 0, 4, 3, 3, 5};
-short cori[] = {0, 1, 2, 3, 0, 1, 2, 0, 3, 0, 0, 1, 3, 0};
-short resp[] = {1, 2, 1, 1, 2, 1, 1, 3, 1, 3, 5, 2, 4, 2};
-/* ---------------------------------------------------------------- */
-/* candy1_main.c : función principal main() para test de tarea 1C 	*/
+/* candy1_main.c : función principal main() para test de tarea 1A 	*/
 /*					(requiere tener implementada la tarea 1E)		*/
 /* ---------------------------------------------------------------- */
 int main(void)
 {
-	unsigned char level = 0;		// nivel del juego (nivel inicial = 0)
+	unsigned char level = 1;		// nivel del juego (nivel inicial = 0)
 	
+	seed32 = time(NULL);		// fija semilla de números aleatorios
 	consoleDemoInit();			// inicialización de pantalla de texto
-	printf("candyNDS (prueba tarea 1C)\n");
+	printf("candyNDS (prueba tarea 1A)\n");
 	printf("\x1b[38m\x1b[1;0H  nivel: %d", level);
 
 	do							// bucle principal de pruebas
 	{
-		copia_matriz(matrix, mapas[level]);	// sustituye a inicializa_matriz()
+		inicializa_matriz(matrix, level);
+		recombina_elementos(matrix);
 		escribe_matriz_testing(matrix);
-		if (hay_secuencia(matrix))			// si hay secuencias
-			printf("\x1b[39m\x1b[3;0H hay secuencia: SI");
-		else
-			printf("\x1b[39m\x1b[3;0H hay secuencia: NO");
 		retardo(3);
-		printf("\x1b[39m\x1b[3;19H (pulse A/B)");
+		printf("\x1b[39m\x1b[3;8H (pulse A o B)");
 		do
 		{	swiWaitForVBlank();
 			scanKeys();					// esperar pulsación tecla 'A' o 'B'
 		} while (!(keysHeld() & (KEY_A | KEY_B)));
-		printf("\x1b[3;0H                               ");
+		printf("\x1b[3;8H              ");
 		retardo(3);
 		if (keysHeld() & KEY_A)			// si pulsa 'A',
 		{								// pasa a siguiente nivel
@@ -486,4 +477,3 @@ int main(void)
 	} while (1);
 	return(0);
 }
-
