@@ -10,6 +10,9 @@
 .include "candy1_incl.i"
 
 
+.bss 
+	.align 2
+	vec_posi: .space 12 @;6 hwords
 
 @;-- .text. código de las rutinas ---
 .text	
@@ -28,10 +31,108 @@
 @;		R0 = 1 si hay una secuencia, 0 en otro caso
 	.global hay_combinacion
 hay_combinacion:
-		push {lr}
+		push {r1-r12,lr}
 		
+		mov r7, r0
+		mov r8, #0
+		mov r9, #0
 		
-		pop {pc}
+	.Lrecoregut:
+		mov r5, #0x07
+		mov r11 , r9
+		mov r10 , #COLUMNS
+		mul r11, r10
+		mov r10, r11
+		add r10, r8
+		ldrb r4, [r7, r10]
+		mov r3, r4
+		and r3, r5
+		cmp r3, #0 		@;buit
+		beq .LSeguentPosi
+		cmp r3, #7		@;solido, hueco
+		beq .LSeguentPosi
+	@; entrem a comprovar la fila
+		mov r6, #COLUMNS-1 @;la penultima
+		cmp r8, r6 
+		beq .LcomprovaROWS
+		add r10, #1
+		ldrb r6, [r7, r10]
+		sub r10, #1
+		mov r3, r6	
+		and r3, r5
+		cmp r3, #0 		@;buit
+		beq .LcomprovaROWS
+
+		cmp r3, #7		@;solido, hueco
+		beq .LcomprovaROWS
+
+		mov r2, r4
+		and r2, r5
+		cmp r3, R2
+		beq .LcomprovaROWS
+
+		add r10, #1
+		strb r4, [r7, r10] @;+1
+		sub r10, #1
+		strb r6, [r7, r10] @;0
+		mov r0, r7
+		bl hay_secuencia
+		strb r4, [r7, r10] @;0
+		add r10, #1
+		strb r6, [r7, r10] @;+1
+		sub r10, #1
+		cmp r0, #1
+		beq .Fi
+
+
+	.LcomprovaROWS:
+		mov r6, #ROWS-1 @; anterior a la penultima
+		cmp r9, r6
+		beq .LSeguentPosi
+
+		mov r11, #COLUMNS
+		add r10, r11
+		ldrb r6, [r7, r10]
+		sub r10, r11
+		mov r3, r6	
+		and r3, r5
+		cmp r3, #0 		@;buit
+		beq .LSeguentPosi
+
+		cmp r3, #7		@;solido, hueco
+		beq .LSeguentPosi
+
+		mov r2, r4
+		and r2, r5
+		cmp r3, R2
+		beq .LSeguentPosi
+
+		add r10, r11
+		strb r4, [r7, r10]
+		sub r10, r11
+		strb r6, [r7, r10]
+		mov r0, r7
+		bl hay_secuencia
+		strb r4, [r7, r10]
+		add r10, r11
+		strb r6, [r7, r10]
+		sub r10, r11
+		cmp r0, #1
+		beq .Fi
+
+	.LSeguentPosi:
+		cmp r8, #COLUMNS-1
+		addlo r8, #1
+		addeq r9, #1
+		moveq r8, #0
+		cmpeq r9, #ROWS
+		blo .Lrecoregut
+		moveq r0, #0
+		beq .Fi
+
+		
+	.Fi:
+		pop {r1-r12,pc}
 
 
 
@@ -57,6 +158,7 @@ hay_combinacion:
 sugiere_combinacion:
 		push {lr}
 		
+
 		
 		pop {pc}
 
@@ -86,7 +188,7 @@ sugiere_combinacion:
 @;		vector de posiciones (x1,y1,x2,y2,x3,y3), devuelto por referencia
 genera_posiciones:
 		push {lr}
-		
+		         
 		
 		pop {pc}
 
@@ -114,11 +216,46 @@ genera_posiciones:
 @;				en medio de secuencia: 4 -> horizontal, 5 -> vertical
 @;				sin secuencia: 6 
 detecta_orientacion:
-		push {lr}
+		push {r3, r5, lr}
 		
+		mov r5, #0				@;R5 = índice bucle de orientaciones
+		mov r0, #4
+		bl mod_random
+		mov r3, r0				@;R3 = orientación aleatoria (0..3)
+	.Ldetori_for:
+		mov r0, r4
+		bl cuenta_repeticiones
+		cmp r0, #1
+		beq .Ldetori_cont		@;no hay inicio de secuencia
+		cmp r0, #3
+		bhs .Ldetori_fin		@;hay inicio de secuencia
+		add r3, #2
+		and r3, #3				@;R3 = salta dos orientaciones (módulo 4)
+		mov r0, r4
+		bl cuenta_repeticiones
+		add r3, #2
+		and r3, #3				@;restituye orientación (módulo 4)
+		cmp r0, #1
+		beq .Ldetori_cont		@;no hay continuación de secuencia
+		tst r3, #1
+		moveq r3, #4			@;detección secuencia horizontal
+		beq .Ldetori_fin
+	.Ldetori_vert:
+		mov r3, #5				@;detección secuencia vertical
+		b .Ldetori_fin
+	.Ldetori_cont:
+		add r3, #1
+		and r3, #3				@;R3 = siguiente orientación (módulo 4)
+		add r5, #1
+		cmp r5, #4
+		blo .Ldetori_for		@;repetir 4 veces
 		
-		pop {pc}
-
+		mov r3, #6				@;marca de no encontrada
+		
+	.Ldetori_fin:
+		mov r0, r3				@;devuelve orientación o marca de no encontrada
+		
+		pop {r3, r5, pc}
 
 
 .end

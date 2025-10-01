@@ -450,7 +450,10 @@ short posX[] = {0, 0, 0, 0, 4, 4, 4, 0, 0, 5, 4, 1, 1, 1};
 short posY[] = {2, 2, 2, 2, 4, 4, 4, 0, 0, 0, 4, 3, 3, 5};
 short cori[] = {0, 1, 2, 3, 0, 1, 2, 0, 3, 0, 0, 1, 3, 0};
 short resp[] = {1, 2, 1, 1, 2, 1, 1, 3, 1, 3, 5, 2, 4, 2};
+<<<<<<< HEAD
 
+=======
+>>>>>>> ae8c3450b78101db8aeaac02f1f314c969a12818
 /* ---------------------------------------------------------------- */
 /* candy1_main.c : función principal main() para test de tarea 1C 	*/
 /*					(requiere tener implementada la tarea 1E)		*/

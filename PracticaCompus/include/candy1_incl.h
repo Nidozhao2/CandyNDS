@@ -23,6 +23,7 @@
 
 
 #define MASK_GEL 0x07 					// Mascara per filtrar els valors buits 0, 8 i 16.
+#define ESTE 0x00 						// Mascara per filtrar este
 
 
 	// candy1_conf.s //

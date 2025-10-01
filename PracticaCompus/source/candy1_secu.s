@@ -39,6 +39,7 @@
 @;		R0 = 1 si hay una secuencia, 0 en otro caso
 .global hay_secuencia
 hay_secuencia:
+<<<<<<< HEAD
         push {r1-r12,lr}
 
         mov r7, r0
@@ -94,6 +95,62 @@ hay_secuencia:
         mov r0, #1
         .Fi:
         pop {r1-r12,pc}
+=======
+		push {r1-r12,lr}
+		
+		mov r7, r0
+		mov r8, #0
+		mov r9, #0
+		.Lrecoregut:
+		mov r5, #0x07
+		mov r11 , r9
+		mov r10 , #COLUMNS
+		mul r11, r10
+		mov r10, r11
+		add r10, r8
+		ldrb r4, [r7, r10]
+		mov r3, r4
+		and r3, r5
+		cmp r3, #0 		@;buit
+		beq .LSeguentPosi
+		cmp r3, #7		@;solido, hueco
+		beq .LSeguentPosi
+
+		mov r6, #COLUMNS-2 @; anterior a la penultima
+		cmp r8, r6
+		movlo r0, r7
+		movlo r1, r9
+		movlo r2, r8
+		movlo r3, #0
+		bllo cuenta_repeticiones
+		cmp r0, #2
+		bhi .Fi1	
+		
+		mov r6, #ROWS-2 @; anterior a la penultima
+		cmp r9, r6
+		movlo r0, r7
+		movlo r1, r9
+		movlo r2, r8
+		movlo r3, #1
+		bllo cuenta_repeticiones
+		cmp r0, #2
+		bhi .Fi1	
+
+		.LSeguentPosi:
+		cmp r8, #COLUMNS-1
+		addlo r8, #1
+		addeq r9, #1
+		moveq r8, #0
+		cmpeq r9, #ROWS
+		blo .Lrecoregut
+		moveq r0, #0
+		beq .Fi
+
+		.Fi1:
+		mov r0, #1
+		.Fi:
+		pop {r1-r12,pc}
+>>>>>>> ae8c3450b78101db8aeaac02f1f314c969a12818
 
 
 @;TAREA 1D;
@@ -134,10 +191,58 @@ elimina_secuencias:
 @;		R0 = dirección base de la matriz de juego
 @;		R1 = dirección de la matriz de marcas
 marca_horizontales:
-		push {lr}
+		push {r2-r12, lr}
+		
+		mov r7 ,r0
+		ldr r12, =num_sec
+		ldrb r12, [r12]
+		mov r8, #0  @;inicialitzem x i y
+		mov r9, #0
+		.LbucleHorizontal:
+		mov r5, #0x07
+		mov r11 , r9
+		mov r10 , #COLUMNS
+		mul r11, r10
+		mov r10, r11
+		ldrb r4, [r7, r10]
+		mov r3, r4
+		and r3, r5
+		cmp r3, #0 		@;buit
+		beq .LSeguentPos
+		cmp r3, #7		@;solido, hueco
+		beq .LSeguentPos
+		push {r1}
+		mov r0, r7
+		mov r1, r9
+		mov r2, r8
+		mov	r3, #0
+		bl cuenta_repeticiones
+		pop {r1}
+		mov r5, #0
+		cmp r0, #3
+		blo .LSeguentPos
+		add r12, #1
+		.LBuclefor:
+		strb r12, [r1, r10]
+		add r10, #1
+		add r5, #1
+		cmp r5, r0
+		blo .LBuclefor
 		
 		
-		pop {pc}
+
+
+		.LSeguentPos:
+		cmp r8, #COLUMNS-2
+		addlo r8, #1
+		addeq r9, #1
+		moveq r8, #0
+		cmpeq r9, #ROWS
+		blo .LbucleHorizontal
+		beq .Lfinal
+
+.Lfinal:
+		pop {r2-r12, pc}
 
 
 
