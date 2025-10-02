@@ -41,6 +41,9 @@
 cuenta_repeticiones:
 		push {r1-r10,lr}
 
+
+
+
 		mov r4, #COLUMNS
 		mla r4, r1, r4, r2 
 
@@ -67,7 +70,8 @@ cuenta_repeticiones:
 		 
 
 
-		
+		cmp r1, #0
+		beq .Lfi_cuenta
 		mov r7, r1
 		mov r5, #COLUMNS 
 		rsb r5,r5,#0  @; r5 obté el offser per iteració 
@@ -97,7 +101,9 @@ cuenta_repeticiones:
 
 		.Loeste:
 
-		mov r7, r2	
+		mov r7, r2
+		cmp r2, #0
+		beq .Lfi_cuenta	
 		mov r5, #1  @; r5 obté el offser per iteració 	
 		rsb r5,r5, #0
 		

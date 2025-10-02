@@ -66,30 +66,38 @@ inicializa_matriz:
 		.lseguentcolumna:
 
 		ldrb r6, [r4, r5] @;primer valor del mapa que volem jugar
-		add r5, r5, #1 @; movem un byte
+		strb r6, [r7, r8]
+		mov r9, r6 @; per no perdre el valor
+
+		and r6, #MASK_GEL
+		cmp r6, #0
+		bne .Lseguent_iteracio_init
+
 
 
 		.Lgenerar_caramel:   @; mejora necesaria: cambiarlo por mascaras
-		mov r0, #6 @; per a obtenir numero entre 0-5 
+
 		
-		and r6, r6, #7
+		mov r6, #3
+		lsl r6, #3
+		and r6, r9 @; guardem a r6 les marques de gelatines
 
-		cmp r6, #0		@;comprobar si el tile es 0, 8 o 16 para generar
-		bleq mod_random
-		cmp r6, #0 @; tornem a comprobar per si hem perdut el flag
-		addeq r0, r0, #1
 
+		mov r0, #6 @; per a obtenir numero entre 0-5 
+		bl mod_random
+		add r0, r0, #1
+		add r0, r6 @; li afegim la gelatina
 
 		mov r10 , #0 @; contador de horizontales (este-oeste)
 		mov r11, #0 @; contador verticales (norte-sur)
 
 
 
+
+
+
+		
 		strb r0, [r7,r8]
-
-
-
-
 		mov r3, #2
 		
 		.Lcomprobar_repetits:
@@ -113,7 +121,11 @@ inicializa_matriz:
 
 
 
+		.Lseguent_iteracio_init:
+	
 		add r8, #1 @; movem un byte
+		add r5, #1 @; movem un byte
+
 		add r2, r2,#1
 		cmp r2, #COLUMNS		@;comprobar si se han recorrido todas las columnas
 		bne .lseguentcolumna
@@ -175,24 +187,29 @@ recombina_elementos:
 		
 		.lb_seguentcolumna:
 		
-		mov r11, #5
+		mov r11, #10
 		.Lrecombinacio:
 			ldrb r4, [r7, r10]
 			and r5, r4, #0x7
-			cmp r5, #0			@; si l'element de la matriu base és buida, forat o sòlid ignorem
+			cmp r5, #0			 @; el control del 0 no té sentit a nivell algorismic doncs mai recombinariem 
+			                     @; un valor de caramel no inicialitzat pero igualment comptarem aquest cas
 			beq .Lseguent_iteracio_base
-			cmp r5, #0x7
+			cmp r5, #0x7        @; si l'element de la matriu base és buida, forat o sòlid ignorem
 			beq .Lseguent_iteracio_base
 
 			mov r6, r4, lsr #3	
-			and r6, #0x03		@; en teoria reduntant r6 = codi de gelatina
+			@;and r6, #0x03		@; en teoria reduntant r6 = codi de gelatina
 
 			.Lcasella_aleatoria:
 				mov r0, #ROWS*COLUMNS
 				bl mod_random
 				ldrb r4, [r8, r0] 	@; obtenir posició aleatòria de mat_recomb1[][]
-				cmp r4, #0
+				cmp r4, #0			
+
 				beq .Lcasella_aleatoria @; torna a intentar si la posició conté un 0
+
+			mov r5, #0
+			strb r5, [r8, r0]	@; fixem 0 a la posició visitada de mat_recomb1[][]
 
 			@; afegim el codi de la gelatina de la casella
 			cmp r6, #2
@@ -200,7 +217,8 @@ recombina_elementos:
 			cmpne r6, #1
 			addeq r4, #8
 
-			strb r4, [r9, r10]
+
+
 
 
 			mov r0, r9
@@ -214,7 +232,7 @@ recombina_elementos:
 			
 			sub r11, #1		@; gastem un intent de recombinació
 			cmp r11, #0
-			blo .Linici_recomb @; tornem a començar de nou la recombinació si es supera els intents màxims
+			beq .Linici_recomb @; tornem a començar de nou la recombinació si es supera els intents màxims
 
 			bl cuenta_repeticiones
 			cmp r0, #3
@@ -224,13 +242,15 @@ recombina_elementos:
 			add r3, #1
 			bl cuenta_repeticiones
 			cmp r0, #3
-
 			bhs .Lrecombinacio	@; torna a intentar amb altre element si forma secuència
 
-			mov r5, #0
-			strb r5, [r8, r10]	@; fixem 0 a la posició visitada de mat_recomb1[][]
-			add r10, #1 @; incrementen offset
-			.Lseguent_iteracio_base:				
+
+
+			.Lseguent_iteracio_base:		
+
+				mov r10, #COLUMNS
+				mla r10, r1, r10, r2
+				strb r4, [r9, r10]
 
 				add r2, #1
 				cmp r2, #COLUMNS
