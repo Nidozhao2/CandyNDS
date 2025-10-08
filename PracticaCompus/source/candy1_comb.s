@@ -157,8 +157,47 @@ hay_combinacion:
 	.global sugiere_combinacion
 sugiere_combinacion:
 		push {lr}
+		mov r7, r0 @; per no perdre la direccio base de la matriu
+		mov r8, r1 @; per no perdre la direccio del vector de posicions
+		.Lrandom_comb:
+		mov r0, #ROWS
+		bl mod_random
+		mov r1, r0
+		mov r0, #COLUMNS
+		bl mod_random
+		mov r2, r0
+
+		.Lcanvieste:@; Hem de fer canvis mirant cap a on es forma una combinacio i tenir el codigo de orientacion ori
+
+			mov r3, #COLUMNS
+			mla r3, r1, r3, r2
+
+		.Lcanvisur:
+
+		.Lcanvioeste:
+
+		.Lcanvinorte:
+
+
+
+
+
+
+
+
+
+
+
+		mov r4, r7
+		bl detecta_orientacion
+		cmp r0, #6
+		beq .Lrandom_comb
+
+		mov r3, r0
+		mov r0, r8
 		
 
+	
 		
 		pop {pc}
 
@@ -187,10 +226,134 @@ sugiere_combinacion:
 @;	Resultado:
 @;		vector de posiciones (x1,y1,x2,y2,x3,y3), devuelto por referencia
 genera_posiciones:
-		push {lr}
+		push {r5-r6,lr}
+		mov r6, r0
+		cmp r4, #1
+		blo .Lizquierda
+		beq .Lderecha
+		cmp r4, #3
+		blo .Larriba
+		beq .Labajo
+
+		.Lizquierda: @; si es izquierda tienes que hacer columna+1
+			add r5, r2, #1
+			strb r5,[r6]
+			add r6, #1
+			strb r1,[r6]
+			b .Lori
+		.Lderecha: @; si es derecha """""" columna -1
+			sub r5, r2, #1
+			strb r5,[r6]
+			add r6, #1
+			strb r1, [r6]
+			b .Lori
+		.Larriba: @; si es arriba """" fila -1
+			strb r2,[r6]
+			sub r5, r1, #1
+			add r6, #1
+			strb r5,[r6]
+			b .Lori
+		.Labajo: @; si es abajo """" fila +1
+			strb r2,[r6]
+			add r5, r1, #1
+			add r6, #1
+			strb r5,[r6]
+			
+
+		.Lori:
+		add r6, #1 @; ara r6 esta la direccio de x2
+
+		cmp r3, #1
+		blo .Leste
+		beq .Lsur
+		cmp r3, #3
+		blo .Loeste
+		beq .Lnorte
+		cmp r3, #4
+		beq .Lhorizontal
 		
+		@;sino el vertical
+
+		.Lvertical:
+		strb r2, [r6]
+		add r6,#1
+		add r1, #1
+		strb r1,[r6]
+		add r6, #1
+		strb r2,[r6]
+		add r6, #1
+		sub r1,#2
+		strb r1,[r6]
 		
-		pop {pc}
+
+
+
+		.Leste:
+		add r2, #1
+		strb r2,[r6]
+		add r6, #1
+		strb r1, [r6]
+
+		add r2, #1
+		add r6, #1
+		strb r2,[r6]
+		add r6, #1
+		strb r1, [r6]
+
+
+		.Lsur:
+
+		strb r2,[r6]
+		add r6, #1
+		add r1, #1
+		strb r1, [r6]
+
+		add r6, #1
+		strb r2, [r6]
+		add r6, #1
+		add r1, #1
+		strb r1, [r6]
+
+
+
+		.Loeste:
+
+		sub r2, #1
+		strb r2,[r6]
+		add r6, #1
+		strb r1, [r6]
+
+		sub r2, #1
+		add r6, #1
+		strb r2,[r6]
+		add r6, #1
+		strb r1, [r6]
+
+		.Lnorte:
+
+		strb r2,[r6]
+		add r6, #1
+		sub r1, #1
+		strb r1, [r6]
+
+		add r6, #1
+		strb r2, [r6]
+		add r6, #1
+		sub r1, #1
+		strb r1, [r6]
+		.Lhorizontal:
+
+		add r2, #1
+		strb r2, [r6]
+		add r6, #1
+		strb r1, [r6]
+		add r6, #1
+		sub r2, #2
+		strb r2, [r6]
+		add r6, #1
+		strb r1,[r6]
+		
+		pop {r5-r6,pc}
 
 
 
