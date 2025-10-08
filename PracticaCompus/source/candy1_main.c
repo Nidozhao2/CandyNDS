@@ -472,7 +472,7 @@ int main(void)
         // Mostrar resultado en pantalla
         escribe_matriz_testing(matrix);   // ver cómo quedó la matriz tras eliminar
 
-        
+         
 
         retardo(3);
         printf("\x1b[39m\x1b[5;19H (pulse A/B)");
