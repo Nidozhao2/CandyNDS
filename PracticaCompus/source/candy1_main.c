@@ -451,30 +451,30 @@ short posY[] = {2, 2, 2, 2, 4, 4, 4, 0, 0, 0, 4, 3, 3, 5};
 short cori[] = {0, 1, 2, 3, 0, 1, 2, 0, 3, 0, 0, 1, 3, 0};
 short resp[] = {1, 2, 1, 1, 2, 1, 1, 3, 1, 3, 5, 2, 4, 2};
 /* ---------------------------------------------------------------- */
-/* candy1_main.c : función principal main() para test de tarea 1F   */
-/*                   (usa elimina_secuencias)                       */
+/* candy1_main.c : función principal main() para test de tarea 1D   */
+/*                     (elimina_secuencias)                         */
 /* ---------------------------------------------------------------- */
 
 int main(void)
 {
     unsigned char level = 0;    // nivel inicial
+	unsigned int lvl = 0;
 
     consoleDemoInit();          // inicialización de pantalla de texto
     printf("candyNDS (prueba elimina_secuencias)\n");
     printf("\x1b[38m\x1b[1;0H  nivel: %d", level);
-
+	
+	inicializa_matriz(matrix, level);
+	escribe_matriz_testing(matrix);
+	retardo(10);
+	elimina_secuencias(matrix, mat_mar);
+	escribe_matriz_testing(matrix);
     do
     {
-        copia_matriz(matrix, mapas[level]);   // cargar un mapa fijo
-
-        elimina_secuencias(matrix, mat_mar);
-
-        // Mostrar resultado en pantalla
-        escribe_matriz_testing(matrix);   // ver cómo quedó la matriz tras eliminar
 
          
 
-        retardo(3);
+        retardo(2);
         printf("\x1b[39m\x1b[5;19H (pulse A/B)");
 
         // esperar pulsación
@@ -491,14 +491,27 @@ int main(void)
 
 		if (keysHeld() & KEY_B)   // pasar al siguiente nivel
         {
+			if (lvl % 2 == 0){
             printf("\x1b[39m\x1b[3;0H matriz de marcas:\n");
         	escribe_matriz_testing(mat_mar);   // mostrar las marcas con identificadores
-        }
+
+       		}
+			else{
+				escribe_matriz_testing(matrix);
+			}
+			lvl ++;
+		}
 
 
         if (keysHeld() & KEY_A)   // pasar al siguiente nivel
         {
+			
             level = (level + 1) % MAXLEVEL;
+			inicializa_matriz(matrix, level);
+			escribe_matriz_testing(matrix);
+			retardo(10);
+			elimina_secuencias(matrix, mat_mar);
+			escribe_matriz_testing(matrix);
             printf("\x1b[38m\x1b[1;8H %d", level);
         }
 

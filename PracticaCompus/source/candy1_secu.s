@@ -224,7 +224,7 @@ marca_horizontales:
 
 
 		.LSeguentPos:
-		cmp r8, #COLUMNS-2
+		cmp r8, #COLUMNS-1
 		addlo r8, #1
 		addeq r9, #1
 		moveq r8, #0
@@ -317,10 +317,11 @@ marca_verticales:
 		.LSeguentPosV:
 		cmp r8, #COLUMNS
 		addlo r8, #1
+		blo .LbucleVertical
 		addeq r9, #1
 		moveq r8, #0
-		cmpeq r9, #ROWS-2
-		blo .LbucleHorizontal
+		cmpeq r9, #ROWS-1
+		blo .LbucleVertical
 		beq .LfinalV
 
 .LfinalV:
