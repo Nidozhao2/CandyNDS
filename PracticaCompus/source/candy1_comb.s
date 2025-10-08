@@ -10,9 +10,9 @@
 .include "candy1_incl.i"
 
 
-.bss 
-	.align 2
-	vec_posi: .space 12 @;6 hwords
+@; .bss 
+@;	.align 2
+@;	vec_posi: .space 6 @;6 hwords
 
 @;-- .text. código de las rutinas ---
 .text	
@@ -188,7 +188,7 @@ sugiere_combinacion:
 @;		vector de posiciones (x1,y1,x2,y2,x3,y3), devuelto por referencia
 genera_posiciones:
 		push {lr}
-		         
+		
 		
 		pop {pc}
 

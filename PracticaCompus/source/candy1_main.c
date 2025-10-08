@@ -440,83 +440,44 @@ void procesa_sugerencia(char mat[][COLUMNS], unsigned short lap)
 }
 
 
-
 /* ---------------------------------------------------------------- */
-/* candy1_main.c : función principal main() para test de tarea 1E 	*/
+/* candy1_main.c : función principal main() para test de tarea 1B 	*/
 /* ---------------------------------------------------------------- */
-#define NUMTESTS 14
-short nmap[] = {4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 8};
-short posX[] = {0, 0, 0, 0, 4, 4, 4, 0, 0, 5, 4, 1, 1, 1};
-short posY[] = {2, 2, 2, 2, 4, 4, 4, 0, 0, 0, 4, 3, 3, 5};
-short cori[] = {0, 1, 2, 3, 0, 1, 2, 0, 3, 0, 0, 1, 3, 0};
-short resp[] = {1, 2, 1, 1, 2, 1, 1, 3, 1, 3, 5, 2, 4, 2};
-/* ---------------------------------------------------------------- */
-/* candy1_main.c : función principal main() para test de tarea 1D   */
-/*                     (elimina_secuencias)                         */
-/* ---------------------------------------------------------------- */
-
 int main(void)
 {
-    unsigned char level = 0;    // nivel inicial
-	unsigned int lvl = 0;
-
-    consoleDemoInit();          // inicialización de pantalla de texto
-    printf("candyNDS (prueba elimina_secuencias)\n");
-    printf("\x1b[38m\x1b[1;0H  nivel: %d", level);
+	unsigned char level = 0;		// nivel del juego (nivel inicial = 0)
 	
+	seed32 = time(NULL);		// fija semilla de números aleatorios
+	consoleDemoInit();			// inicialización de pantalla de texto
+	printf("candyNDS (prueba tarea 1A)\n");
+	printf("\x1b[38m\x1b[1;0H  nivel: %d", level);
 	inicializa_matriz(matrix, level);
 	escribe_matriz_testing(matrix);
-	retardo(10);
-	elimina_secuencias(matrix, mat_mar);
-	escribe_matriz_testing(matrix);
-    do
-    {
+	recombina_elementos(matrix);
 
-         
+	do							// bucle principal de pruebas
+	{
+		escribe_matriz_testing(matrix);
 
-        retardo(2);
-        printf("\x1b[39m\x1b[5;19H (pulse A/B)");
-
-        // esperar pulsación
-        do {
-            swiWaitForVBlank();
-            scanKeys();
-        } while (!(keysHeld() & (KEY_A | KEY_B)));
-
-        printf("\x1b[2;0H                               ");
-        printf("\x1b[3;0H                               ");
-        printf("\x1b[4;0H                               ");
-        printf("\x1b[5;19H                               ");
-        retardo(3);
-
-		if (keysHeld() & KEY_B)   // pasar al siguiente nivel
-        {
-			if (lvl % 2 == 0){
-            printf("\x1b[39m\x1b[3;0H matriz de marcas:\n");
-        	escribe_matriz_testing(mat_mar);   // mostrar las marcas con identificadores
-
-       		}
-			else{
-				escribe_matriz_testing(matrix);
-			}
-			lvl ++;
+		retardo(3);
+		printf("\x1b[39m\x1b[3;8H (pulse A o B)");
+		do
+		{	swiWaitForVBlank();
+			scanKeys();					// esperar pulsación tecla 'A' o 'B'
+		} while (!(keysHeld() & (KEY_A | KEY_B)));
+		printf("\x1b[3;8H              ");
+		retardo(3);
+		if (keysHeld() & KEY_A)			// si pulsa 'A',
+		{								// pasa a siguiente nivel
+			level = (level + 1) % MAXLEVEL;
+			inicializa_matriz(matrix, level);
+			printf("\x1b[38m\x1b[1;8H %d", level);
+		}
+		if(keysHeld() & KEY_B){
+			recombina_elementos(matrix);
 		}
 
 
-        if (keysHeld() & KEY_A)   // pasar al siguiente nivel
-        {
-			
-            level = (level + 1) % MAXLEVEL;
-			inicializa_matriz(matrix, level);
-			escribe_matriz_testing(matrix);
-			retardo(10);
-			elimina_secuencias(matrix, mat_mar);
-			escribe_matriz_testing(matrix);
-            printf("\x1b[38m\x1b[1;8H %d", level);
-        }
-
-    } while (1);
-
-    return 0;
+	} while (1);
+	return(0);
 }
-
