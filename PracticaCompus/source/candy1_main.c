@@ -444,20 +444,27 @@ void procesa_sugerencia(char mat[][COLUMNS], unsigned short lap)
 /* candy1_main.c : función principal main() para test de tarea 1A 	*/
 /*					(requiere tener implementada la tarea 1E)		*/
 /* ---------------------------------------------------------------- */
+
+/* ---------------------------------------------------------------- */
+/* candy1_main.c : función principal main() para test de tarea 1A 	*/
+/*					(requiere tener implementada la tarea 1E)		*/
+/* ---------------------------------------------------------------- */
 int main(void)
 {
-	unsigned char level = 5;		// nivel del juego (nivel inicial = 0)
+	unsigned char level = 0;		// nivel del juego (nivel inicial = 0)
 	
 	seed32 = time(NULL);		// fija semilla de números aleatorios
 	consoleDemoInit();			// inicialización de pantalla de texto
-	printf("candyNDS (prueba tarea 1B)\n");
+	printf("candyNDS (prueba tarea 1A)\n");
 	printf("\x1b[38m\x1b[1;0H  nivel: %d", level);
+	inicializa_matriz(matrix, level);
+	escribe_matriz_testing(matrix);
+	recombina_elementos(matrix);
 
 	do							// bucle principal de pruebas
 	{
-		inicializa_matriz(matrix, level);
 		escribe_matriz_testing(matrix);
-		recombina_elementos(matrix);
+
 		retardo(3);
 		printf("\x1b[39m\x1b[3;8H (pulse A o B)");
 		do
@@ -469,9 +476,13 @@ int main(void)
 		if (keysHeld() & KEY_A)			// si pulsa 'A',
 		{								// pasa a siguiente nivel
 			level = (level + 1) % MAXLEVEL;
-			inicializa_matriz(matrix,level);
+			inicializa_matriz(matrix, level);
 			printf("\x1b[38m\x1b[1;8H %d", level);
 		}
+		if(keysHeld() & KEY_B){
+			recombina_elementos(matrix);
+		}
+
 
 	} while (1);
 	return(0);
