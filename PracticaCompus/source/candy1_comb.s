@@ -156,9 +156,10 @@ hay_combinacion:
 @;				guardarán las coordenadas (x1,y1,x2,y2,x3,y3), consecutivamente.
 	.global sugiere_combinacion
 sugiere_combinacion:
-		push {lr}
+		push {r2-r9, lr}
 		mov r7, r0 @; per no perdre la direccio base de la matriu
 		mov r8, r1 @; per no perdre la direccio del vector de posicions
+		mov r6, #4
 		.Lrandom_comb:
 		mov r0, #ROWS
 		bl mod_random
@@ -167,39 +168,190 @@ sugiere_combinacion:
 		bl mod_random
 		mov r2, r0
 
+		.Linici:
+		@;calculem el offset
+		mov r3, #COLUMNS
+		mla r3, r1, r3, r2 @;TO-DO: que no es surti de la matriu
+		cmp r2, #COLUMNS
+		beq .Lcanvisur
 		.Lcanvieste:@; Hem de fer canvis mirant cap a on es forma una combinacio i tenir el codigo de orientacion ori
 
-			mov r3, #COLUMNS
-			mla r3, r1, r3, r2
+			
+			ldrb r4, [r7, r3] @;intercanvi de les llaminadures
+			mov r10, r4
+			and r10, #7
+			cmp r10, #7
+			beq .LSeguentPosicio
 
+			add r3, #1
+			ldrb r5, [r7, r3]
+			sub r3, #1
+			mov r10, r5
+			and r10, #7
+			cmp r10, #7
+			beq .Lcanvisur
+
+
+
+			mov r0, #0
+			
+			strb r0, [r7, r3]@;REVISAR QUE SI LA QUE SE MUEVE INVOLUNTARIAMENTE GENERA COMBINACIO
+			add r3, #1
+			strb r4, [r7, r3]
+			sub r3, #1
+			
+			mov r0, r7
+			bl hay_secuencia
+			cmp r0, #1
+			bne .Lretornacanvieste
+			mov r4, r7
+			bl detecta_orientacion
+			mov r9, r0 @;ori
+			mov r6, #1 @;cpi
+			
+		.Lretornacanvieste:
+			ldrb r4, [r7, r3] @;intercanvi de les llaminadures
+			add r3, #1
+			ldrb r5, [r7, r3]
+			sub r3, #1
+			strb r5, [r7, r3]
+			add r3, #1
+			strb r4, [r7, r3]
+			sub r3, #1
+			cmp r6, #4
+			bne .Lcpioribe
 		.Lcanvisur:
 
+			cmp r1, #ROWS
+			beq .Lcanvioeste
+			ldrb r4, [r7, r3]
+			add r3, #COLUMNS
+			ldrb r5, [r7, r3]
+			mov r10, r5
+			and r10, #7
+			cmp r10, #7
+			subeq r3, #COLUMNS
+			beq .Lcanvioeste
+
+			mov r0, #0
+			strb r4, [r7, r3]
+			sub r3, #COLUMNS
+			strb r0, [r7, r3]
+
+			mov r0, r7
+			bl hay_secuencia
+			cmp r0, #1
+			bne .Lretornacanvisur
+			mov r4, r7
+			bl detecta_orientacion
+			mov r9, r0
+			mov r6, #3
+		.Lretornacanvisur:
+			ldrb r4, [r7, r3]
+			add r3, #COLUMNS
+			ldrb r5, [r7, r3]
+			strb r4, [r7, r3]
+			sub r3, #COLUMNS
+			strb r5, [r7, r3]
+			cmp r6, #4
+			bne .Lcpioribe
+
 		.Lcanvioeste:
+			cmp r2, #0
+			beq .Lcanvinorte
+			ldrb r4, [r7, r3]
+			sub r3, #1
+			ldrb r5, [r7, r3]
+			mov r10, r5
+			and r10, #7
+			cmp r10, #7
+			addeq r3, #1
+			beq .Lcanvinorte
+
+			mov r0, #0
+
+			strb r4, [r7, r3]
+			add r3, #1
+			strb r0, [r7, r3]
+
+			mov r0, r7
+			bl hay_secuencia
+			cmp r0, #1
+			bne .Lretornacanvioeste
+			mov r4, r7
+			bl detecta_orientacion
+			mov r9, r0
+			mov r6, #0
+
+		.Lretornacanvioeste:
+			ldrb r4, [r7, r3]
+			sub r3, #1
+			ldrb r5, [r7, r3]
+			strb r4, [r7, r3]
+			add r3, #1
+			strb r5, [r7, r3]
+			cmp r6, #4
+			bne .Lcpioribe
 
 		.Lcanvinorte:
+			cmp r1, #0
+			beq .LSeguentPosicio
+			ldrb r4, [r7, r3]
+			sub r3, #COLUMNS
+			ldrb r5, [r7, r3]
+			mov r10, r5
+			and r10, #7
+			cmp r10, #7
+			addeq r3, #COLUMNS
+			beq .LSeguentPosicio
+			mov r0, #0
+			strb r4, [r7, r3]
+			add r3, #COLUMNS
+			strb r0, [r7, r3]
 
+			mov r0, r7
+			bl hay_secuencia
+			cmp r0, #1
+			bne .Lretornacanvinorte
+			mov r4, r7
+			bl detecta_orientacion
+			mov r9, r0
+			mov r6, #2
 
+		.Lretornacanvinorte:
+			ldrb r4, [r7, r3]
+			sub r3, #COLUMNS
+			ldrb r5, [r7, r3]
+			strb r4, [r7, r3]
+			add r3, #COLUMNS
+			strb r5, [r7, r3]
+			cmp r6, #4
+			bne .Lcpioribe
+		
+		.LSeguentPosicio:
+		@;Si no ha trobat cap combinacio, passa a la següent posicio i torna a començar
+		cmp r3, #ROWS*COLUMNS
+		moveq r1, #0
+		moveq r2, #0
+		beq .Linici
+ 
+ @;r1: rows i r2: columns
+		cmp r2, #COLUMNS
+		addne r2, #1
+		bne .Linici
+		mov r2, #0
+		add r1, #1
+		b .Linici
 
+		@;si ha passat TOT, ja tenim cpi i ori
 
-
-
-
-
-
-
-
-		mov r4, r7
-		bl detecta_orientacion
-		cmp r0, #6
-		beq .Lrandom_comb
-
-		mov r3, r0
+		.Lcpioribe:
 		mov r0, r8
+		mov r3, r9
+		mov r4, r6
+		bl genera_posiciones	
 		
-
-	
-		
-		pop {pc}
+		pop {r2-r9,pc}
 
 
 
