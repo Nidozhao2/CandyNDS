@@ -156,50 +156,202 @@ hay_combinacion:
 @;				guardarán las coordenadas (x1,y1,x2,y2,x3,y3), consecutivamente.
 	.global sugiere_combinacion
 sugiere_combinacion:
-		push {lr}
-		mov r7, r0 @; per no perdre la direccio base de la matriu
-		mov r8, r1 @; per no perdre la direccio del vector de posicions
-		.Lrandom_comb:
-		mov r0, #ROWS
+		push {r2-r10, lr}
+		mov r7, r0	@;r7 es la matriu
+		mov r8, r1	@;r8 es el vector de posicions
+		
+		mov r0, #ROWS	@;Calculem fila i columna aleatoria
 		bl mod_random
-		mov r1, r0
+		mov r1, r0	
 		mov r0, #COLUMNS
 		bl mod_random
 		mov r2, r0
 
-		.Lcanvieste:@; Hem de fer canvis mirant cap a on es forma una combinacio i tenir el codigo de orientacion ori
+		.Linici:
+		mov r3, #COLUMNS
+		mul r3, r1
+		add r3, r2	@;r3 es l'offset
+		ldrb r4, [r7, r3] @;r4 es el valor de la llaminadura a la posicio aleatoria
+		mov r5, r4
+		and r5, #0x07
+		cmp r5, #0				@;comprovem que no sigui ni buit ni un bloc solid, etc
+		beq .LSeguentPosicio
+		cmp r5, #7
+		beq .LSeguentPosicio
+	
+		cmp r2, #0
+		beq .Lderechagen
 
-			mov r3, #COLUMNS
-			mla r3, r1, r3, r2
+		@;si no està al limit per la dreta, comprovem el moviment de l'esquerra
+		@;ESQUERRA
+		ldrb r4, [r7, r3]
+		sub r3, #1
+		ldrb r5, [r7, r3] @;r5 es la llaminatura que es mou involuntariament
+		mov r6, r5
+		and r6, #0x07
+		cmp r6, #7		@;comprovem que no sigui bloc solid ni buit
+		addeq r3, #1
+		beq .Lderechagen
 
-		.Lcanvisur:
+		mov r6, #0
 
-		.Lcanvioeste:
+		strb r4, [r7, r3]
+		add r3, #1
+		strb r6, [r7, r3]
+		
+		mov r4, r7
+		sub r2, #1
+		bl detecta_orientacion
+		add r2, #1
+		@;retornem la matriu a com estava
+		sub r3, #1
+		ldrb r4, [r7, r3]
+		strb r5, [r7, r3]
+		add r3, #1
+		strb r4, [r7, r3]
 
-		.Lcanvinorte:
+		cmp r0, #6		@;si no ha trobat cap orientacio vàlida, passa
+		beq .Lderechagen
+
+		mov r9, r0 @;r9 es ori
+		mov r10, #0 @;r10 es cpi
+		b .Lcridagenerapos
 
 
+		@;DRETA
+		.Lderechagen:
+		cmp r2, #COLUMNS	@;comprovem que no estigui al limit
+		beq .Larribagen
+		ldrb r4, [r7, r3]
+		add r3, #1
+		ldrb r5, [r7, r3] @;r5 es la llaminadura que es mou involuntariament
+		mov r6, r5
+		and r6, #0x07
+		cmp r6, #7
+		subeq r3, #1
+		beq .Larribagen
+
+		mov r6, #0
+		strb r4, [r7, r3]
+		sub r3, #1
+		strb r6, [r7, r4]
+		
+		mov r4, r7
+		add r2, #1
+		bl detecta_orientacion
+		sub r2, #1
+		@;retornem la matriu a com estava
+		add r3, #1
+		ldrb r4, [r7, r3]
+		strb r5, [r7, r3]
+		sub r3, #1
+		strb r4, [r7, r3]
+
+		cmp r0, #6			@;Si no ha trobat cap direccio valida, seguent
+		beq .Larribagen
+		mov r9, r0 @;ori
+		mov r10, #1 @;cpi
+		b .Lcridagenerapos
 
 
+		@;ADALT
+		.Larribagen:
+		cmp r1, #0
+		beq .Labajogen
+		ldrb r4, [r7, r3]
+		sub r3, #COLUMNS
+		ldrb r5, [r7, r3]
+		mov r6, r5
+		and r6, #0x07	@;comprovem que no sigui solid ni buit
+		cmp r6, #7
+		addeq r3, #COLUMNS
+		beq .Labajogen
 
-
-
-
-
-
+		mov r6, #0
+		strb r4, [r7, r3]
+		add r3, #COLUMNS
+		strb r6, [r7, r3]
 
 		mov r4, r7
+		sub r1, #1
 		bl detecta_orientacion
+		add r1, #1
+		@;retornem la matriu a com estava
+		sub r3, #COLUMNS
+		ldrb r4, [r7, r3]
+		strb r5, [r7, r3]
+		add r3, #COLUMNS
+		strb r4, [r7, r3]
+
 		cmp r0, #6
-		beq .Lrandom_comb
+		beq .Labajogen
+		mov r9, r0 @;ori
+		mov r10, #2 @;cpi
+		b .Lcridagenerapos
 
-		mov r3, r0
+		@;ABAIX
+		.Labajogen:
+		cmp r1, #ROWS
+		beq .LSeguentPosicio
+		ldrb r4, [r7, r3]
+		add r3, #COLUMNS
+		ldrb r5, [r7, r3]
+		mov r6, r5
+		and r6, #0x07	@;comprovem que no sigui solid ni buit
+		cmp r6, #7
+		subeq r3, #COLUMNS
+		beq .LSeguentPosicio
+
+		mov r6, #0
+		strb r4, [r7, r3]
+		sub r3, #COLUMNS
+		strb r6, [r7, r3]
+
+		mov r4, r7
+		add r1, #1
+		bl detecta_orientacion
+		sub r1, #1
+		@;retornem la matriu a com estava
+		add r3, #COLUMNS
+		ldrb r4, [r7, r3]
+		strb r5, [r7, r3]
+		sub r3, #COLUMNS
+		strb r4, [r7, r3]
+
+		cmp r0, #6
+		beq .LSeguentPosicio
+		mov r9, r0 @;ori
+		mov r10, #3 @;cpi
+		b .Lcridagenerapos
+
+		.LSeguentPosicio:
+		cmp r2, #COLUMNS
+		bne .LNofinalcol	@;si no s'ha arriba al final de la fila, seguir
+		cmp r1, #ROWS	@;si ha arribat al final, reiniciar el recorregut
+		moveq r2, #0
+		moveq r1, #0
+		beq .Linici
+		mov r2, #0
+		add r1, #1
+		b .Linici
+		.LNofinalcol:
+		add r2, #1
+		b .Linici
+
+
+		.Lcridagenerapos:
+		@;r9 es ori
+		@;r10 es cpi
+		@;r1 es fila
+		@;r2 es columna
+		@;r8 es el vect
 		mov r0, r8
-		
+		mov r3, r9
+		mov r4, r10
+		bl genera_posiciones
 
-	
 		
-		pop {pc}
+		pop {r2-r10,pc}
 
 
 
@@ -228,6 +380,10 @@ sugiere_combinacion:
 genera_posiciones:
 		push {r5-r6,lr}
 		mov r6, r0
+		strb r2, [r6]	@;x1
+		add r6, #1
+		strb r1, [r6]	@;y1
+		add r6, #1 @; ara r6 esta la direccio de x2
 		cmp r4, #1
 		blo .Lizquierda
 		beq .Lderecha
@@ -235,33 +391,22 @@ genera_posiciones:
 		blo .Larriba
 		beq .Labajo
 
-		.Lizquierda: @; si es izquierda tienes que hacer columna+1
-			add r5, r2, #1
-			strb r5,[r6]
-			add r6, #1
-			strb r1,[r6]
-			b .Lori
-		.Lderecha: @; si es derecha """""" columna -1
+
+		.Lizquierda: @; si es izquierda tienes que hacer columna-1
 			sub r5, r2, #1
-			strb r5,[r6]
-			add r6, #1
-			strb r1, [r6]
+			b .Lori
+		.Lderecha: @; si es derecha """""" columna+1
+			add r5, r2, #1
 			b .Lori
 		.Larriba: @; si es arriba """" fila -1
-			strb r2,[r6]
 			sub r5, r1, #1
-			add r6, #1
-			strb r5,[r6]
 			b .Lori
 		.Labajo: @; si es abajo """" fila +1
-			strb r2,[r6]
 			add r5, r1, #1
-			add r6, #1
-			strb r5,[r6]
 			
 
 		.Lori:
-		add r6, #1 @; ara r6 esta la direccio de x2
+		@;r6 segueix estant la direccio de x2
 
 		cmp r3, #1
 		blo .Leste
@@ -276,7 +421,7 @@ genera_posiciones:
 
 		.Lvertical:
 		strb r2, [r6]
-		add r6,#1
+		add r6, #1
 		add r1, #1
 		strb r1,[r6]
 		add r6, #1
@@ -284,7 +429,7 @@ genera_posiciones:
 		add r6, #1
 		sub r1,#2
 		strb r1,[r6]
-		
+		b .Lend
 
 
 
@@ -299,6 +444,7 @@ genera_posiciones:
 		strb r2,[r6]
 		add r6, #1
 		strb r1, [r6]
+		b .Lend
 
 
 		.Lsur:
@@ -313,6 +459,7 @@ genera_posiciones:
 		add r6, #1
 		add r1, #1
 		strb r1, [r6]
+		b .Lend
 
 
 
@@ -328,6 +475,7 @@ genera_posiciones:
 		strb r2,[r6]
 		add r6, #1
 		strb r1, [r6]
+		b .Lend
 
 		.Lnorte:
 
@@ -341,6 +489,9 @@ genera_posiciones:
 		add r6, #1
 		sub r1, #1
 		strb r1, [r6]
+		b .Lend
+
+
 		.Lhorizontal:
 
 		add r2, #1
@@ -352,6 +503,8 @@ genera_posiciones:
 		strb r2, [r6]
 		add r6, #1
 		strb r1,[r6]
+
+		.Lend:
 		
 		pop {r5-r6,pc}
 
