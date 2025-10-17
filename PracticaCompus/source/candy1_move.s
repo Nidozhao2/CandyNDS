@@ -151,7 +151,12 @@ cuenta_repeticiones:
 	.global baja_elementos
 baja_elementos:
 		push {r1- r12, lr}
-		
+		mov r4, r0 # conservem direcció de matriu de joc
+
+		bl baja_verticales
+		cmp r0, #0
+		bleq baja_laterales
+
 		
 		pop {r1-r12, pc}
 
