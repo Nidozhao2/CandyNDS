@@ -456,14 +456,15 @@ int main(void)
 	
 	inicializa_matriz(matrix, level);
 	escribe_matriz_testing(matrix);
-	sugiere_combinacion(matrix, vector);
+
     do
     {
 
          
 
-        retardo(2);
+        retardo(10);
         printf("\x1b[39m\x1b[2;2H %d, %d, %d, %d, %d, %d", vector[0], vector[1], vector[2], vector[3], vector[4], vector[5]);
+		escribe_matriz_testing(matrix);
 
         // esperar pulsación
         do {
@@ -485,9 +486,22 @@ int main(void)
             level = (level + 1) % MAXLEVEL;
 			inicializa_matriz(matrix, level);
 			escribe_matriz_testing(matrix);
-			sugiere_combinacion(matrix, vector);
+			
             printf("\x1b[38m\x1b[1;8H %d", level);
         }
+		if (keysHeld() & KEY_B){
+			elimina_secuencias(matrix, mat_mar);
+			if (hay_combinacion(matrix)){
+				sugiere_combinacion(matrix, vector);
+			}
+			else{
+				printf("\x1b[39m\x1b[2;2H no hay secuencia");
+				recombina_elementos(matrix);
+			}
+			
+			escribe_matriz_testing(matrix);
+
+		}
 
     } while (1);
 

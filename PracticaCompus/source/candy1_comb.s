@@ -193,17 +193,18 @@ sugiere_combinacion:
 		addeq r3, #1
 		beq .Lderechagen
 
-		mov r6, #0
+		
 
 		strb r4, [r7, r3]
 		add r3, #1
-		strb r6, [r7, r3]
+		strb r5, [r7, r3]
 		
 		mov r4, r7
 		sub r2, #1
 		bl detecta_orientacion
 		add r2, #1
 		@;retornem la matriu a com estava
+		ldrb r5, [r7, r3]
 		sub r3, #1
 		ldrb r4, [r7, r3]
 		strb r5, [r7, r3]
@@ -220,7 +221,7 @@ sugiere_combinacion:
 
 		@;DRETA
 		.Lderechagen:
-		cmp r2, #COLUMNS	@;comprovem que no estigui al limit
+		cmp r2, #COLUMNS-1	@;comprovem que no estigui al limit
 		beq .Larribagen
 		ldrb r4, [r7, r3]
 		add r3, #1
@@ -231,16 +232,17 @@ sugiere_combinacion:
 		subeq r3, #1
 		beq .Larribagen
 
-		mov r6, #0
+		
 		strb r4, [r7, r3]
 		sub r3, #1
-		strb r6, [r7, r4]
+		strb r5, [r7, r3]
 		
 		mov r4, r7
 		add r2, #1
 		bl detecta_orientacion
 		sub r2, #1
 		@;retornem la matriu a com estava
+		ldrb r5, [r7, r3]
 		add r3, #1
 		ldrb r4, [r7, r3]
 		strb r5, [r7, r3]
@@ -267,16 +269,17 @@ sugiere_combinacion:
 		addeq r3, #COLUMNS
 		beq .Labajogen
 
-		mov r6, #0
+
 		strb r4, [r7, r3]
 		add r3, #COLUMNS
-		strb r6, [r7, r3]
+		strb r5, [r7, r3]
 
 		mov r4, r7
 		sub r1, #1
 		bl detecta_orientacion
 		add r1, #1
 		@;retornem la matriu a com estava
+		ldrb r5, [r7, r3]
 		sub r3, #COLUMNS
 		ldrb r4, [r7, r3]
 		strb r5, [r7, r3]
@@ -291,7 +294,7 @@ sugiere_combinacion:
 
 		@;ABAIX
 		.Labajogen:
-		cmp r1, #ROWS
+		cmp r1, #ROWS-1
 		beq .LSeguentPosicio
 		ldrb r4, [r7, r3]
 		add r3, #COLUMNS
@@ -302,16 +305,17 @@ sugiere_combinacion:
 		subeq r3, #COLUMNS
 		beq .LSeguentPosicio
 
-		mov r6, #0
+		
 		strb r4, [r7, r3]
 		sub r3, #COLUMNS
-		strb r6, [r7, r3]
+		strb r5, [r7, r3]
 
 		mov r4, r7
 		add r1, #1
 		bl detecta_orientacion
 		sub r1, #1
 		@;retornem la matriu a com estava
+		ldrb r5, [r7, r3]
 		add r3, #COLUMNS
 		ldrb r4, [r7, r3]
 		strb r5, [r7, r3]
@@ -325,9 +329,9 @@ sugiere_combinacion:
 		b .Lcridagenerapos
 
 		.LSeguentPosicio:
-		cmp r2, #COLUMNS
+		cmp r2, #COLUMNS-1
 		bne .LNofinalcol	@;si no s'ha arriba al final de la fila, seguir
-		cmp r1, #ROWS	@;si ha arribat al final, reiniciar el recorregut
+		cmp r1, #ROWS-1	@;si ha arribat al final, reiniciar el recorregut
 		moveq r2, #0
 		moveq r1, #0
 		beq .Linici
@@ -383,7 +387,7 @@ genera_posiciones:
 		strb r2, [r6]	@;x1
 		add r6, #1
 		strb r1, [r6]	@;y1
-		add r6, #1 @; ara r6 esta la direccio de x2
+		add r6, #1 @;ara r6 esta la direccio de x2
 		cmp r4, #1
 		blo .Lizquierda
 		beq .Lderecha
@@ -393,16 +397,16 @@ genera_posiciones:
 
 
 		.Lizquierda: @; si es izquierda tienes que hacer columna-1
-			sub r5, r2, #1
+			sub r2, r2, #1
 			b .Lori
 		.Lderecha: @; si es derecha """""" columna+1
-			add r5, r2, #1
+			add r2, r2, #1
 			b .Lori
 		.Larriba: @; si es arriba """" fila -1
-			sub r5, r1, #1
+			sub r1, r1, #1
 			b .Lori
 		.Labajo: @; si es abajo """" fila +1
-			add r5, r1, #1
+			add r1, r1, #1
 			
 
 		.Lori:
@@ -420,14 +424,15 @@ genera_posiciones:
 		@;sino el vertical
 
 		.Lvertical:
+
 		strb r2, [r6]
 		add r6, #1
 		add r1, #1
 		strb r1,[r6]
 		add r6, #1
-		strb r2,[r6]
+		strb r2, [r6]
 		add r6, #1
-		sub r1,#2
+		sub r1, #2
 		strb r1,[r6]
 		b .Lend
 
