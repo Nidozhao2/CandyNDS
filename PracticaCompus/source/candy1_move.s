@@ -151,7 +151,7 @@ cuenta_repeticiones:
 	.global baja_elementos
 baja_elementos:
 		push {r1- r12, lr}
-		mov r4, r0 # conservem direcció de matriu de joc
+		mov r4, r0 @; conservem direcció de matriu de joc
 
 		bl baja_verticales
 		cmp r0, #0
@@ -176,19 +176,24 @@ baja_elementos:
 @;				movido nada  
 baja_verticales:
 		push {r1-r12, lr}
-		@; En principio está bien?
-		mov r6, #ROWS @; index de row
-		mov r7, #COLUMNS @; index de column
+		mov r6, #ROWS-1 @; index de row
+		mov r7, #COLUMNS-1 @; index de column
 		mov r0, #0
 
 		.Lrecorregut_ver:
-			mov r7, #COLUMNS
-				
-			mul r10, r7, r6
+
+			mov r3, #COLUMNS	
+			mul r10, r6, r3		@; r10 = N_columns * index_row
+			add r10, r7			@; r10 = r10 + index_col
 			ldrb r3, [r4, r10]
 
 			mov r2, r6 @; r2 és l'iterador de les files per damunt
 			mov r1, r10 @; conservem el offset a altre registre per manipular-lo després
+
+			and r12, r3, #0x07
+			cmp r12, #0	@; només moguem si la casella es buida
+			bne .Lfi_bucle_vertical
+
 			.Lbucle_vertical:
 				cmp r2, #0
 				beq .Lrandom
@@ -205,7 +210,6 @@ baja_verticales:
 				cmp r12, #0
 				beq .Lfi_bucle_vertical
 
-				and r12, r11, #0x07
 				strb r12, [r4, r10]
 				mov r0, #1
 
@@ -217,16 +221,17 @@ baja_verticales:
 				movne r12, #0
 
 				strb r12, [r4, r1]
+				b .Lrecorregut_ver
 
 				.Lrandom:
 
+					ldrb r11, [r4, r1]
 					mov r12, r11, lsr #3
 					cmp r12, #2
 					moveq r12, #16
-					cmp r12, #1
+					cmpne r12, #1
 					moveq r12, #8
 					movne r12, #0
-					
 
 					mov r0, #6
 					bl mod_random
@@ -235,18 +240,15 @@ baja_verticales:
 					add r0, r12
 					strb r0, [r4, r10]
 					mov r0, #1
-					
-					b .Lrecorregut_ver
-
 
 			.Lfi_bucle_vertical:
-			cmp r7, #0
-			subhi r7, #1
-			subeq r6, #1
-			moveq r7, #COLUMNS
-			cmpeq r6, #0
-			blo .Lrecorregut_ver
-			beq .Lfi_ver
+				cmp r7, #0
+				subhi r7, #1
+				subeq r6, #1
+				moveq r7, #COLUMNS-1
+				cmpeq r6, #0
+				bge .Lrecorregut_ver
+				blo .Lfi_ver
 
 		.Lfi_ver:
 		
@@ -262,42 +264,35 @@ baja_verticales:
 @;		R0 = 1 indica que se ha realizado algún movimiento; 0 indica que no ha
 @;				movido nada 
 baja_laterales:
-		push {lr}
+		push {r1-r12, lr}
 		
-		mov r6, #ROWS @; index de row
-		mov r7, #COLUMNS @; index de column
+		mov r6, #ROWS-1 @; index de row
+		mov r7, #COLUMNS-1 @; index de column
 		mov r0, #0
 
 		.Lrecorregut_lat:
-			mov r7, #COLUMNS
-				
-			mul r10, r7, r6
+			mov r3, #COLUMNS	
+			mul r10, r6, r3		@; r10 = N_columns * index_row
+			add r10, r7			@; r10 = r10 + index_col
 			ldrb r3, [r4, r10]
-
 
 			mov r1, r10 @; conservem el offset a altre registre per manipular-lo després
 
-		
-
 			and r5, r3, #0x07 @; si no es 0, ignorem
 			cmp r5, #0
-			bne .Lrecorregut_lat
+			bne .Lfi_bucle_lat
 
 			sub r1, #COLUMNS
 			ldrb r2, [r4, r1]
-			cmpeq r2, #7		@; si el imediatament superior és sòlid continuem
-			bne .Lrecorregut_lat
+			cmp r2, #7		@; si el imediatament superior és sòlid continuem
+			bne .Lfi_bucle_lat
 
 			.LcheckDiagonals:
-				cmp r7, #COLUMNS
-				beq .LbaixarEsquerra
-				cmpne r7, #0
-				beq .LbaixarDreta
-				mov r11, #0 	@; r11 es el codi que diu si adalt-dreta/adalt-esquerra/els dos son vàlids
+				mov r11, #0 	@; r11 es el codi que diu si adalt-dreta/adalt-esquerra o els dos son vàlids
 
 				sub r1, #1	@; agafem el de adalt a la esquerra
 				ldrb r5, [r4, r1]
-				add r1, #2 @; agafem el de adalt a la dreat
+				add r1, #2 @; agafem el de adalt a la dreta
 				ldrb r9, [r4, r1]
 
 				and r12, r5, #0x07
@@ -305,25 +300,33 @@ baja_laterales:
 				cmpne r12, #0
 				addne r11, #1	@; r11=1 adalt-esquerra es vàlid
 
+				cmp r11, #1
+				cmpeq r7, #COLUMNS-1 @; si adalt-esquerra es vàlid i index_col == COLUMNS-1, baixem d'esquerra
+				beq .LbaixarEsquerra
+
 				and r12, r9, #0x07
 				cmp r12, #7
 				cmpne r12, #0
 				addne r11, #2	@; r11=2 adalt-dreta es vàlid
+				cmp r11, #2
+				cmpeq r7, #0	@; si adalt-dreta es vàlid i index_col == 0, baixem de dreta
+				beq .LbaixarDreta
 
 				cmp r11, #0
-				b .Lrecorregut_lat	@; si cap es vàlid seguent iteració
+				beq .Lfi_bucle_lat	@; si cap es vàlid seguent iteració
 				cmp r11, #1
-				b .LbaixarEsquerra
+				beq .LbaixarEsquerra
 				cmp r11, #2
-				b .LbaixarDreta
+				beq .LbaixarDreta
 				cmp r11, #3
-				b .LbaixaRandom
+				beq .LbaixaRandom
 
-				sub r1, #1 @; retornem r1 a la posició inmediatament 
-
+				sub r1, #1 @; retornem r1 a la posició inmediatament superior
 
 			.LbaixarEsquerra:
 				push {r3,r6, r7}
+
+				sub r1, #1 @; posició adalt-esquerra
 				mov r7, r3, lsr #3
 				mov r6, r5, lsr #3
 				and r2, r5, #0x07
@@ -338,13 +341,16 @@ baja_laterales:
 				moveq r8, #8
 				cmpne r6, #2
 				moveq r8, #16
+				movne r8, #0
 				strb r8, [r4, r1]
+
 				mov r0, #1
 				pop {r3,r6, r7}
 				b .Lfi_bucle_lat
 
 			.LbaixarDreta:
 				push {r3,r6, r7}
+				
 				mov r7, r3, lsr #3
 				mov r6, r9, lsr #3
 				and r2, r9, #0x07
@@ -359,6 +365,7 @@ baja_laterales:
 				moveq r8, #8
 				cmpne r6, #2
 				moveq r8, #16
+				movne r8, #0
 				strb r8, [r4, r1]
 				mov r0, #1
 				pop {r3,r6, r7}
@@ -375,14 +382,14 @@ baja_laterales:
 			cmp r7, #0
 			subhi r7, #1
 			subeq r6, #1
-			moveq r7, #COLUMNS
-			cmpeq r6, #0
-			blo .Lrecorregut_lat
-			beq .Lfi_lat
+			moveq r7, #COLUMNS-1
+			cmpeq r6, #1
+			bge .Lrecorregut_lat
+			blo .Lfi_lat
 
 		.Lfi_lat:
 		
-		pop {pc}
+		pop {r1-r12, pc}
 
 
 .end

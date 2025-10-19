@@ -441,30 +441,33 @@ void procesa_sugerencia(char mat[][COLUMNS], unsigned short lap)
 
 
 /* ---------------------------------------------------------------- */
-/* candy1_main.c : función principal main() para test de tarea 1H   */
+/* candy1_main.c : función principal main() para test de tarea 1F   */
 /*                     (sugiere_combinacion)                        */
 /* ---------------------------------------------------------------- */
 
 int main(void)
 {
     unsigned char level = 0;    // nivel inicial
-	unsigned char vector[6] = {0,0,0,0,0,0};
+	char movimiento = 0;
 
     consoleDemoInit();          // inicialización de pantalla de texto
-    printf("candyNDS (prueba elimina_secuencias)\n");
+    printf("candyNDS (prueba baja_elementos)\n");
     printf("\x1b[38m\x1b[1;0H  nivel: %d", level);
 	
 	inicializa_matriz(matrix, level);
 	escribe_matriz_testing(matrix);
-
+	elimina_secuencias(matrix, mat_mar);
+	retardo(20);
+	escribe_matriz_testing(matrix);
+	do {
+		movimiento = baja_elementos(matrix);
+	} while (movimiento);
+	retardo(20);
+	escribe_matriz_testing(matrix);
     do
     {
 
-         
-
-        retardo(10);
-        printf("\x1b[39m\x1b[2;2H %d, %d, %d, %d, %d, %d", vector[0], vector[1], vector[2], vector[3], vector[4], vector[5]);
-		escribe_matriz_testing(matrix);
+        retardo(2);
 
         // esperar pulsación
         do {
@@ -478,29 +481,21 @@ int main(void)
         printf("\x1b[5;19H                               ");
         retardo(3);
 
-
-
         if (keysHeld() & KEY_A)   // pasar al siguiente nivel
         {
 			
             level = (level + 1) % MAXLEVEL;
 			inicializa_matriz(matrix, level);
 			escribe_matriz_testing(matrix);
-			
             printf("\x1b[38m\x1b[1;8H %d", level);
-        }
-		if (keysHeld() & KEY_B){
+        } else if (keysHeld() & KEY_B) {
 			elimina_secuencias(matrix, mat_mar);
-			if (hay_combinacion(matrix)){
-				sugiere_combinacion(matrix, vector);
-			}
-			else{
-				printf("\x1b[39m\x1b[2;2H no hay secuencia");
-				recombina_elementos(matrix);
-			}
-			
 			escribe_matriz_testing(matrix);
-
+			retardo(15);
+			do {
+				movimiento = baja_elementos(matrix);
+			} while (movimiento);
+			escribe_matriz_testing(matrix);
 		}
 
     } while (1);
