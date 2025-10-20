@@ -215,7 +215,8 @@ baja_verticales:
 				cmp r12, #0
 				beq .Lfi_bucle_vertical
 
-				strb r12, [r4, r10]
+
+				strb r3, [r4, r10]
 				mov r0, #1
 
 				mov r12, r11, lsr #3
@@ -223,8 +224,6 @@ baja_verticales:
 				moveq r12, #8
 				cmp r12, #2
 				moveq r12, #16
-				cmp r12, #0
-				moveq r12, #0
 
 				strb r12, [r4, r1]
 				b .Lrecorregut_ver
