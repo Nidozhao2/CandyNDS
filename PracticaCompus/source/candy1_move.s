@@ -221,9 +221,10 @@ baja_verticales:
 				mov r12, r11, lsr #3
 				cmp r12, #1
 				moveq r12, #8
-				cmpne r12, #2
+				cmp r12, #2
 				moveq r12, #16
-				movne r12, #0
+				cmp r12, #0
+				moveq r12, #0
 
 				strb r12, [r4, r1]
 				b .Lrecorregut_ver
