@@ -217,9 +217,9 @@ baja_verticales:
 
 				mov r3, r3, lsr #3
 				cmp r3, #1
-				addeq r3, #8
+				addeq r12, #8
 				cmp r3, #2
-				addeq r3, #16
+				addeq r12, #16
 				strb r12, [r4, r10]
 				mov r0, #1
 
