@@ -317,6 +317,7 @@ baja_laterales:
 				cmpeq r7, #0	@; si adalt-dreta es vàlid i index_col == 0, baixem de dreta
 				beq .LbaixarDreta
 
+				sub r1, #1 @; retornem r1 a la posició inmediatament superior
 				cmp r11, #0
 				beq .Lfi_bucle_lat	@; si cap es vàlid seguent iteració
 				cmp r11, #1
@@ -326,7 +327,6 @@ baja_laterales:
 				cmp r11, #3
 				beq .LbaixaRandom
 
-				sub r1, #1 @; retornem r1 a la posició inmediatament superior
 
 			.LbaixarEsquerra:
 				push {r3,r6, r7}
@@ -356,6 +356,7 @@ baja_laterales:
 			.LbaixarDreta:
 				push {r3,r6, r7}
 				
+				add r1, #1
 				mov r7, r3, lsr #3
 				mov r6, r9, lsr #3
 				and r2, r9, #0x07
