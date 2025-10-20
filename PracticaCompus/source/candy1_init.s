@@ -185,9 +185,10 @@ recombina_elementos:
 			and r5, r4, #MASK_GEL
 
   
-			//cmp r5, #0						                     
-			//beq .Lseguent_iteracio_base
+
 			cmp r5, #MASK_GEL        @; si l'element de la matriu base és buida, forat o sòlid ignorem
+			beq .Leshueco
+			cmp r5, #0
 			beq .Leshueco
 
 			mov r6, #3
