@@ -460,9 +460,15 @@ short resp[] = {1,1, 2, 1, 1, 2, 1, 1, 3, 1, 3, 5, 2, 4, 2};
 
 int main(void)
 {
+<<<<<<< HEAD
 	unsigned char level;			// nivel del juego
 	unsigned char ntest = 0;		// número de test
 	unsigned char result;			// resultado de cuenta_repeticiones()
+=======
+    unsigned char level = 0;    // nivel inicial
+	char movimiento = 0;
+	seed32 = time(NULL);
+>>>>>>> 4479b609b4b06d755812c6a0b901004798e5ed64
 
 	consoleDemoInit();			// inicialización de pantalla de texto
 	printf("candyNDS (prueba tarea 1E)\n");

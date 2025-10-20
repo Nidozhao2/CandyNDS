@@ -109,6 +109,9 @@ hay_secuencia:
 	.global elimina_secuencias
 elimina_secuencias:
 		push {r2-r12, lr}
+		ldr r7, =num_sec
+		mov r5, #0
+		strb r5, [r7]			@;inicialitza num_sec
 		mov r7, r0
 		mov r5, r1
 		mov r6, #0
@@ -127,7 +130,6 @@ elimina_secuencias:
 		mov r1, r5
 		
 
-@; ATENCIÓN: FALTA CÓDIGO PARA ELIMINAR SECUENCIAS MARCADAS Y GELATINAS
 
 		mov r3, #0
 		mov r5, #0
