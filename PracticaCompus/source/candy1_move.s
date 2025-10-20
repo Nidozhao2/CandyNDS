@@ -351,7 +351,8 @@ baja_laterales:
 				moveq r8, #8
 				cmp r6, #2
 				moveq r8, #16
-				movne r8, #0
+				cmp r6, #0
+				moveq r8, #0
 				strb r8, [r4, r1]
 
 				mov r0, #1
@@ -376,7 +377,8 @@ baja_laterales:
 				moveq r8, #8
 				cmp r6, #2
 				moveq r8, #16
-				movne r8, #0
+				cmp r6, #0
+				moveq r8, #0
 				strb r8, [r4, r1]
 				mov r0, #1
 				pop {r3,r6, r7}
