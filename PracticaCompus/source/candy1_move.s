@@ -290,6 +290,11 @@ baja_laterales:
 			sub r1, #COLUMNS
 			ldrb r2, [r4, r1]
 			cmp r2, #7		@; si el imediatament superior és sòlid continuem
+			beq .LcheckDiagonals
+
+			and r2, #0x07
+			cmp r2, #0
+			beq .LcheckDiagonals	@; si el inmediataments superior es buit també continuem
 			bne .Lfi_bucle_lat
 
 			.LcheckDiagonals:

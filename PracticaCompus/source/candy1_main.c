@@ -442,70 +442,58 @@ void procesa_sugerencia(char mat[][COLUMNS], unsigned short lap)
 
 /* ---------------------------------------------------------------- */
 /* candy1_main.c : función principal main() para test de tarea 1F   */
-/*                     (sugiere_combinacion)                        */
+/*                     (baja_elementos)                        */
 /* ---------------------------------------------------------------- */
-
-
-
-
-/* ---------------------------------------------------------------- */
-/* candy1_main.c : función principal main() para test de tarea 1E 	*/
-/* ---------------------------------------------------------------- */
-#define NUMTESTS 14
-short nmap[] = {0,4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 8};
-short posX[] = {8,0, 0, 0, 0, 4, 4, 4, 0, 0, 5, 4, 1, 1, 1};
-short posY[] = {0,2, 2, 2, 2, 4, 4, 4, 0, 0, 0, 4, 3, 3, 5};
-short cori[] = {0,0, 1, 2, 3, 0, 1, 2, 0, 3, 0, 0, 1, 3, 0};
-short resp[] = {1,1, 2, 1, 1, 2, 1, 1, 3, 1, 3, 5, 2, 4, 2};
 
 int main(void)
 {
-<<<<<<< HEAD
-	unsigned char level;			// nivel del juego
-	unsigned char ntest = 0;		// número de test
-	unsigned char result;			// resultado de cuenta_repeticiones()
-=======
     unsigned char level = 0;    // nivel inicial
-	char movimiento = 0;
+	bool movimiento = false;
 	seed32 = time(NULL);
->>>>>>> 4479b609b4b06d755812c6a0b901004798e5ed64
 
 	consoleDemoInit();			// inicialización de pantalla de texto
-	printf("candyNDS (prueba tarea 1E)\n");
-	level = nmap[0];
+	printf("candyNDS (prueba tarea 1F)\n");
 	printf("\x1b[38m\x1b[1;0H  nivel: %d", level);
 	copia_matriz(matrix, mapas[level]);
 	escribe_matriz_testing(matrix);
-	do							// bucle principal de pruebas
-	{
-		printf("\x1b[39m\x1b[2;0H test %d: posXY (%d, %d), c.ori %d",
-									ntest, posX[ntest], posY[ntest], cori[ntest]);
-		printf("\x1b[39m\x1b[3;0H resultado esperado: %d", resp[ntest]);
-		
-		result = cuenta_repeticiones(matrix, posY[ntest], posX[ntest], cori[ntest]);
-		
-		printf("\x1b[39m\x1b[4;0H resultado obtenido: %d", result);
-		retardo(3);
-		printf("\x1b[38m\x1b[5;19H (pulse A/B)");
-		do
-		{	swiWaitForVBlank();
-			scanKeys();					// esperar pulsación tecla 'A' o 'B'
-		} while (!(keysHeld() & (KEY_A | KEY_B)));
-		printf("\x1b[2;0H                               ");
-		printf("\x1b[3;0H                               ");
-		printf("\x1b[4;0H                               ");
-		printf("\x1b[38m\x1b[5;19H            ");
-		retardo(3);
-		if (keysHeld() & KEY_A)		// si pulsa 'A',
-		{
-			ntest++;				// siguiente test
-			if ((ntest < NUMTESTS) && (nmap[ntest] != level))
-			{				// si número de mapa del siguiente test diferente
-				level = nmap[ntest];		// del número de mapa actual,
-				printf("\x1b[38m\x1b[1;8H %d", level); // cambiar el mapa actual
-				copia_matriz(matrix, mapas[level]);
-				escribe_matriz_testing(matrix);
-			}
+	elimina_secuencias(matrix, mat_mar);
+	retardo(20);
+	escribe_matriz_testing(matrix);
+	do {
+		movimiento = baja_elementos(matrix);
+	} while (movimiento);
+	retardo(20);
+	escribe_matriz_testing(matrix);
+    do
+    {
+
+        retardo(2);
+
+        // esperar pulsación
+        do {
+            swiWaitForVBlank();
+            scanKeys();
+        } while (!(keysHeld() & (KEY_A | KEY_B)));
+
+        printf("\x1b[2;0H                               ");
+        printf("\x1b[3;0H                               ");
+        printf("\x1b[4;0H                               ");
+        printf("\x1b[5;19H                               ");
+        retardo(3);
+
+        if (keysHeld() & KEY_A)   // pasar al siguiente nivel
+        {
+			
+            level = (level + 1) % MAXLEVEL;
+			inicializa_matriz(matrix, level);
+			escribe_matriz_testing(matrix);
+            printf("\x1b[38m\x1b[1;8H %d", level);
+        } else if (keysHeld() & KEY_B) {
+			elimina_secuencias(matrix, mat_mar);
+			escribe_matriz_testing(matrix);
+			retardo(15);
+			movimiento = baja_elementos(matrix);
+			escribe_matriz_testing(matrix);
 		}
 	} while (ntest < NUMTESTS);		// bucle de pruebas
 	printf("\x1b[38m\x1b[5;19H (fin tests)");
