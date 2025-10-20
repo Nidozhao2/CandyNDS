@@ -73,8 +73,6 @@ inicializa_matriz:
 		cmp r6, #0
 		bne .Lseguent_iteracio_init
 
-
-
 		.Lgenerar_caramel:   @; mejora necesaria: cambiarlo por mascaras
 
 		
@@ -91,12 +89,6 @@ inicializa_matriz:
 		mov r10 , #0 @; contador de horizontales (este-oeste)
 		mov r11, #0 @; contador verticales (norte-sur)
 
-
-
-
-
-
-		
 		strb r0, [r7,r8]
 		mov r3, #2
 		
@@ -117,9 +109,6 @@ inicializa_matriz:
 		bhs .Lgenerar_caramel
 		cmp r11, #3
 		bhs .Lgenerar_caramel
-
-
-
 
 		.Lseguent_iteracio_init:
 	
@@ -226,13 +215,6 @@ recombina_elementos:
 			cmp r11, #0
 
 			beq .Linici_recomb @; tornem a començar de nou la recombinació si es supera els intents màxims
-
-			
-
-
-
-				
-
 
 
 				.Lseguent_iteracio_base:	

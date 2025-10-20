@@ -343,13 +343,13 @@ baja_laterales:
 
 				cmp r7, #1
 				addeq r2, #8
-				cmpne r7, #2
+				cmp r7, #2
 				addeq r2, #16
 				strb r2, [r4, r10]
 
 				cmp r6, #1
 				moveq r8, #8
-				cmpne r6, #2
+				cmp r6, #2
 				moveq r8, #16
 				movne r8, #0
 				strb r8, [r4, r1]
@@ -368,13 +368,13 @@ baja_laterales:
 
 				cmp r7, #1
 				addeq r2, #8
-				cmpne r7, #2
+				cmp r7, #2
 				addeq r2, #16
 				strb r2, [r4, r10]
 
 				cmp r6, #1
 				moveq r8, #8
-				cmpne r6, #2
+				cmp r6, #2
 				moveq r8, #16
 				movne r8, #0
 				strb r8, [r4, r1]
