@@ -72,7 +72,7 @@ cuenta_repeticiones:
 
 		cmp r1, #0
 		beq .Lfi_cuenta
-		mov r7, r1
+		mov r7, r1  @; r7 fila
 		mov r5, #COLUMNS 
 		rsb r5,r5,#0  @; r5 obté el offser per iteració 
 
@@ -81,8 +81,13 @@ cuenta_repeticiones:
 		.Leste:		
 
 
+
 		mov r6, #COLUMNS-1
-		sub r7, r6, r2
+
+
+		sub r7, r6, r2 @;r7=numero de columnas menos columna actual
+		cmp r7, #0
+		beq .Lfi_cuenta 
 
 		mov r5, #1 @; r5 obté el offser per iteració 
 
