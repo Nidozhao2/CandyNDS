@@ -449,6 +449,7 @@ int main(void)
 {
     unsigned char level = 0;    // nivel inicial
 	char movimiento = 0;
+	seed32 = time(NULL);
 
     consoleDemoInit();          // inicialización de pantalla de texto
     printf("candyNDS (prueba baja_elementos)\n");
