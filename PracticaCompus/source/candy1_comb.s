@@ -192,6 +192,10 @@ sugiere_combinacion:
 		cmp r6, #7		@;comprovem que no sigui bloc solid ni buit
 		addeq r3, #1
 		beq .Lderechagen
+		mov r9, r4
+		and r9, #0x07
+		cmp r9, r6
+		beq .Lderechagen
 
 		
 
@@ -231,6 +235,11 @@ sugiere_combinacion:
 		cmp r6, #7
 		subeq r3, #1
 		beq .Larribagen
+		mov r9, r4
+		and r9, #0x07
+		cmp r9, r6
+		beq .Larribagen
+
 
 		
 		strb r4, [r7, r3]
@@ -268,6 +277,11 @@ sugiere_combinacion:
 		cmp r6, #7
 		addeq r3, #COLUMNS
 		beq .Labajogen
+		mov r9, r4
+		and r9, #0x07
+		cmp r9, r6
+		beq .Labajogen
+
 
 
 		strb r4, [r7, r3]
@@ -304,6 +318,11 @@ sugiere_combinacion:
 		cmp r6, #7
 		subeq r3, #COLUMNS
 		beq .LSeguentPosicio
+		mov r9, r4
+		and r9, #0x07
+		cmp r9, r6
+		beq .LSeguentPosicio
+
 
 		
 		strb r4, [r7, r3]
