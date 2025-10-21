@@ -190,7 +190,8 @@ baja_verticales:
 			mov r3, #COLUMNS	
 			mul r10, r6, r3		@; r10 = N_columns * index_row
 			add r10, r7			@; r10 = r10 + index_col
-			ldrb r3, [r4, r10]
+			add r3, r4, r10
+			ldrb r3, [r3]
 
 			mov r2, r6 @; r2 és l'iterador de les files per damunt
 			mov r1, r10 @; conservem el offset a altre registre per manipular-lo després
@@ -235,6 +236,12 @@ baja_verticales:
 				.Lrandom:
 
 					ldrb r11, [r4, r1]
+					
+					and r12, r11, #0x07
+					cmp r12, #7
+					moveq r12, #0
+					beq .Lgenerar_caramel_vertical
+
 					mov r12, r11, lsr #3
 					cmp r12, #2
 					moveq r12, #16
@@ -242,6 +249,7 @@ baja_verticales:
 					moveq r12, #8
 					movne r12, #0
 
+					.Lgenerar_caramel_vertical:
 					mov r0, #6
 					bl mod_random
 					add r0, #1
