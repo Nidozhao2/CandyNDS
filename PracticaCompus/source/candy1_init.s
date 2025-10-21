@@ -66,49 +66,46 @@ inicializa_matriz:
 		.lseguentcolumna:
 
 		ldrb r6, [r4, r5] @;primer valor del mapa que volem jugar
-		strb r6, [r7, r8]
+		strb r6, [r7, r8] @; guardem el valor al mapa per a poder cridar a cuenta_repeticiones
 		mov r9, r6 @; per no perdre el valor
 
 		and r6, #MASK_GEL
 		cmp r6, #0
-		bne .Lseguent_iteracio_init
+		bne .Lseguent_iteracio_init  @; en cas de que hi hagi un cero, hem de generar un caramel
+
 
 		.Lgenerar_caramel:   @; mejora necesaria: cambiarlo por mascaras
 
-		
-		mov r6, #3
-		lsl r6, #3
-		and r6, r9 @; guardem a r6 les marques de gelatines
-
+		mov r6, #3  @to-do mask
+		lsl r6, #3 @; si a r6 hi ha un zero rotem a la esquerra 3 bits per crear mascara de gelatina
+		and r6, r9 @; r6 queda la marca de gelatina
 
 		mov r0, #6 @; per a obtenir numero entre 0-5 
 		bl mod_random
 		add r0, r0, #1
 		add r0, r6 @; li afegim la gelatina
 
-		mov r10 , #0 @; contador de horizontales (este-oeste)
-		mov r11, #0 @; contador verticales (norte-sur)
-
 		strb r0, [r7,r8]
-		mov r3, #2
+		mov r3, #0
 		
 		.Lcomprobar_repetits_init:
 
 		mov r0, r7 @; movem a r0 la direccio de memoria
+
 		bl cuenta_repeticiones
 		
-		cmp r3, #2
-		addeq r3, #1
-		addeq r10, r10, r0
-		beq .Lcomprobar_repetits_init
 		
-		cmp r3, #3		
-		addeq r11, r11, r0
+		cmp r0, #3
 		
-		cmp r10, #3
 		bhs .Lgenerar_caramel
-		cmp r11, #3
-		bhs .Lgenerar_caramel
+		
+		cmp r3, #4
+		addne r3, #1
+		bne .Lcomprobar_repetits_init
+		
+
+
+		
 
 		.Lseguent_iteracio_init:
 	
