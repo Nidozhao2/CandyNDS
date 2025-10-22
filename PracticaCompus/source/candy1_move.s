@@ -304,7 +304,7 @@ baja_laterales:
 			cmp r2, #7		@; si el imediatament superior és sòlid continuem
 			beq .LcheckDiagonals
 
-		
+		    and r2, #0x07 //ns que hace esta linea btw pero salía 
 			cmp r2, #0
 			beq .LcheckDiagonals	@; si el inmediataments superior es buit també continuem
 			bne .Lfi_bucle_lat
@@ -321,7 +321,7 @@ baja_laterales:
 				cmp r12, #7
 				cmpne r12, #0
 				addne r11, #1	@; r11=1 adalt-esquerra es vàlid
-
+				sub r1, #1 @; retornem r1 a la posició inmediatament superior
 				cmp r11, #1
 				cmpeq r7, #COLUMNS-1 @; si adalt-esquerra es vàlid i index_col == COLUMNS-1, baixem d'esquerra
 				beq .LbaixarEsquerra
@@ -334,7 +334,7 @@ baja_laterales:
 				cmpeq r7, #0	@; si adalt-dreta es vàlid i index_col == 0, baixem de dreta
 				beq .LbaixarDreta
 
-				sub r1, #1 @; retornem r1 a la posició inmediatament superior
+
 				cmp r11, #0
 				beq .Lfi_bucle_lat	@; si cap es vàlid seguent iteració
 				cmp r11, #1
@@ -365,15 +365,6 @@ baja_laterales:
 				moveq r8, #16
 				cmp r6, #0
 				moveq r8, #0
-
-				@; fix temporal?
-				//esto
-				mov r5, #COLUMNS
-				sub r5, r10, r5
-				ldrb r5, [r5]
-				cmp r5, #7
-				moveq r8, #7	
-				//
 				strb r8, [r4, r1]
 
 				mov r0, #1
