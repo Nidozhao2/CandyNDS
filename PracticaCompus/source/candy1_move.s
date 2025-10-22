@@ -41,9 +41,6 @@
 cuenta_repeticiones:
 		push {r1-r10,lr}
 
-
-
-
 		mov r4, #COLUMNS
 		mla r4, r1, r4, r2 
 
@@ -80,10 +77,7 @@ cuenta_repeticiones:
 
 		.Leste:		
 
-
-
 		mov r6, #COLUMNS-1
-
 
 		sub r7, r6, r2 @;r7=numero de columnas menos columna actual
 		cmp r7, #0
@@ -304,7 +298,7 @@ baja_laterales:
 			cmp r2, #7		@; si el imediatament superior és sòlid continuem
 			beq .LcheckDiagonals
 
-		    and r2, #0x07 //ns que hace esta linea btw pero salía 
+		
 			cmp r2, #0
 			beq .LcheckDiagonals	@; si el inmediataments superior es buit també continuem
 			bne .Lfi_bucle_lat
@@ -316,11 +310,13 @@ baja_laterales:
 				ldrb r5, [r4, r1]
 				add r1, #2 @; agafem el de adalt a la dreta
 				ldrb r9, [r4, r1]
+				
 
 				and r12, r5, #0x07
 				cmp r12, #7
 				cmpne r12, #0
 				addne r11, #1	@; r11=1 adalt-esquerra es vàlid
+
 				sub r1, #1 @; retornem r1 a la posició inmediatament superior
 				cmp r11, #1
 				cmpeq r7, #COLUMNS-1 @; si adalt-esquerra es vàlid i index_col == COLUMNS-1, baixem d'esquerra
@@ -333,8 +329,6 @@ baja_laterales:
 				cmp r11, #2
 				cmpeq r7, #0	@; si adalt-dreta es vàlid i index_col == 0, baixem de dreta
 				beq .LbaixarDreta
-
-
 
 				cmp r11, #0
 				beq .Lfi_bucle_lat	@; si cap es vàlid seguent iteració
@@ -349,7 +343,7 @@ baja_laterales:
 			.LbaixarEsquerra:
 				push {r3,r6, r7}
 
-				
+				sub r1, #1 @; posició adalt-esquerra
 				mov r7, r3, lsr #3
 				mov r6, r5, lsr #3
 				and r2, r5, #0x07
@@ -366,6 +360,7 @@ baja_laterales:
 				moveq r8, #16
 				cmp r6, #0
 				moveq r8, #0
+
 				strb r8, [r4, r1]
 
 				mov r0, #1
