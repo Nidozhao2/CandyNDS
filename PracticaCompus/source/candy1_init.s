@@ -59,65 +59,57 @@ inicializa_matriz:
 
 		mov r8, #0 @; offset per la direccio base de la matriu
 
-		mov r1, #0			@;R5 = contador de columna (inicialment 0)
+		mov r1, #0			@;R1 = contador de fila (inicialment 0)
+		
 		.lseguentfila:
-		mov r2, #0			@;R4 = contador de filas(inicialment 0)		
+		mov r2, #0			@;R2 = contador de columna (inicialment 0)		
 
-		.lseguentcolumna:
+			.lseguentcolumna:
 
-		ldrb r6, [r4, r5] @;primer valor del mapa que volem jugar
-		strb r6, [r7, r8] @; guardem el valor al mapa per a poder cridar a cuenta_repeticiones
-		mov r9, r6 @; per no perdre el valor
+				ldrb r6, [r4, r5] @; valor del mapa de configuració
+				strb r6, [r7, r8] @; guardem el valor al mapa
+				mov r9, r6 @; per no perdre el valor
 
-		and r6, #MASK_GEL
-		cmp r6, #0
-		bne .Lseguent_iteracio_init  @; en cas de que hi hagi un cero, hem de generar un caramel
+				and r6, #MASK_GEL
+				cmp r6, #0
+				bne .Lseguent_iteracio_init  @; en cas de que hi hagi un cero, hem de generar un caramel
 
+				.Lgenerar_caramel:
 
-		.Lgenerar_caramel:   @; mejora necesaria: cambiarlo por mascaras
+				mov r6, #3  @to-do mask
+				lsl r6, #3 @; si a r6 hi ha un zero rotem a la esquerra 3 bits per crear mascara de gelatina
+				and r6, r9 @; r6 queda la marca de gelatina
 
-		mov r6, #3  @to-do mask
-		lsl r6, #3 @; si a r6 hi ha un zero rotem a la esquerra 3 bits per crear mascara de gelatina
-		and r6, r9 @; r6 queda la marca de gelatina
+				mov r0, #6 @; per a obtenir numero entre 0-5 
+				bl mod_random
+				add r0, r0, #1
+				add r0, r6 @; li afegim la gelatina
 
-		mov r0, #6 @; per a obtenir numero entre 0-5 
-		bl mod_random
-		add r0, r0, #1
-		add r0, r6 @; li afegim la gelatina
+				strb r0, [r7,r8]
+				mov r3, #0
+				
+				.Lcomprobar_repetits_init:
 
-		strb r0, [r7,r8]
-		mov r3, #0
+					mov r0, r7 @; movem a r0 la direccio de memoria
+					bl cuenta_repeticiones
+					cmp r0, #3
+					bhs .Lgenerar_caramel
+					
+					cmp r3, #4
+					addne r3, #1
+					bne .Lcomprobar_repetits_init
 		
-		.Lcomprobar_repetits_init:
-
-		mov r0, r7 @; movem a r0 la direccio de memoria
-
-		bl cuenta_repeticiones
-		
-		
-		cmp r0, #3
-		
-		bhs .Lgenerar_caramel
-		
-		cmp r3, #4
-		addne r3, #1
-		bne .Lcomprobar_repetits_init
-		
-
-
-		
-
 		.Lseguent_iteracio_init:
-	
-		add r8, #1 @; movem un byte
-		add r5, #1 @; movem un byte
 
-		add r2, r2,#1
-		cmp r2, #COLUMNS		@;comprobar si se han recorrido todas las columnas
-		bne .lseguentcolumna
-		add r1, r1 ,#1 
-		cmp r1, #ROWS	@;comprobar si se han recorrido todas las filas
-		bne .lseguentfila
+			add r8, #1 @; seguent posició de la matriu de joc
+			add r5, #1 @; seguent posició del mapa de conf
+
+			add r2, #1
+			cmp r2, #COLUMNS		@;comprobar si s'han recorregut totes les columnes
+			bne .lseguentcolumna
+			add r1, #1 
+			cmp r1, #ROWS	@;comprobar si s'han recorregut totes les files
+			bne .lseguentfila
 
 		pop {r0-r11,pc}			@;recuperar registros y retornar al invocador
 
@@ -157,95 +149,79 @@ recombina_elementos:
 			and r5, r4, #MASK_GEL	@; r5 = últims tres bits de l'element (element a copiar sense gelatines)
 			cmp r5, #MASK_GEL
 			moveq r5, #0 		@; si l'element és solid o buit es guarda un 0
-			//cmpne r5, #0   no hace falta realment
-			//moveq r5, #0		@; si el element vacio (0,8,16)
 			strb r5, [r8, r3] 	@; guardem l'element a la matriu mat_recomb1[][]
 
 			add r3, #1
 			cmp r3, #ROWS*COLUMNS
 			blo .Lcopia_matriu
 
-
-
 		mov r10, #0 //offset total columna*fila+columna
+
 		mov r1, #0 @; iterador fila
 		.lb_seguentfila:
-		mov r2, #0 @; iterador de columna
-		.lb_seguentcolumna:
-		
-		mov r11, #25
-		.Lrecombinacio:
+			mov r2, #0 @; iterador de columna
+			.lb_seguentcolumna:
 			
-
-
-			ldrb r4, [r7,r10]
-			and r5, r4, #MASK_GEL
-
-  
-
-			cmp r5, #MASK_GEL        @; si l'element de la matriu base és buida, forat o sòlid ignorem
-			beq .Leshueco
-			cmp r5, #0
-			beq .Leshueco
-
-			mov r6, #3
-			lsl r6, #3		@; en teoria reduntant r6 = codi de gelatina
-			and r6, r6, r5
-
-
-
-			.Lcasella_aleatoria:
-				mov r0, #ROWS*COLUMNS
+			mov r11, #10
+			.Lrecombinacio:
 				
-				bl mod_random
-				mov r12, r0 @; per no perdre el offset de la posicio per posar a 0 mes endavant
-				ldrb r4, [r8, r0] 	@; obtenir posició aleatòria de mat_recomb1[][]
-				cmp r4, #0			
+				ldrb r4, [r7,r10]
+				and r5, r4, #MASK_GEL
 
-				beq .Lcasella_aleatoria @; torna a intentar si la posició conté un 0
+				cmp r5, #MASK_GEL        @; si l'element de la matriu base és buida, forat o sòlid ignorem
+				beq .Leshueco
+				cmp r5, #0
+				beq .Leshueco
+
+				mov r6, #3
+				lsl r6, #3		@; r6 = codi de gelatina
+				and r6, r6, r4
+
+				.Lcasella_aleatoria:
+					mov r0, #ROWS*COLUMNS
+					
+					bl mod_random
+					mov r12, r0 @; per no perdre el offset de la posicio per posar a 0 mes endavant
+					ldrb r4, [r8, r0] 	@; obtenir posició aleatòria de mat_recomb1[][]
+					cmp r4, #0			
+
+					beq .Lcasella_aleatoria @; torna a intentar si la posició conté un 0
 			
-			
+				@; afegim el codi de la gelatina de la casella
+				add r4, r6
+				sub r11, #1		@; gastem un intent de recombinació
+				cmp r11, #0
 
-			@; afegim el codi de la gelatina de la casella
-
-			add r4, r6
-			sub r11, #1		@; gastem un intent de recombinació
-			cmp r11, #0
-
-			beq .Linici_recomb @; tornem a començar de nou la recombinació si es supera els intents màxims
-
-
-				.Lseguent_iteracio_base:	
+				beq .Linici_recomb @; tornem a començar de nou la recombinació si es supera els intents màxims
+	
 				strb r4, [r9, r10]			
 
-
 				.Lcomprobar_repetetits_recom:
-						mov r0, r9
-						mov r3, #2 @; pasem a r3 la orientació que volem que miri, oest i nord (2 i 3)
-						bl cuenta_repeticiones
-						
-						cmp r0, #3
-						bhs .Lrecombinacio	@; torna a intentar amb altre element si forma secuència
-						mov r0, r9
-						add r3, #1
-						bl cuenta_repeticiones
-						cmp r0, #3
-						bhs .Lrecombinacio	@; torna a intentar amb altre element si forma secuència			
-						
+					mov r0, r9
+					mov r3, #2 @; pasem a r3 la orientació que volem que miri, oest i nord (2 i 3)
+					bl cuenta_repeticiones
+							
+					cmp r0, #3
+					bhs .Lrecombinacio	@; torna a intentar amb altre element si forma secuència
+					mov r0, r9
+					add r3, #1
+					bl cuenta_repeticiones
+					cmp r0, #3
+					bhs .Lrecombinacio	@; torna a intentar amb altre element si forma secuència			
+							
 				.Leshueco:
-				strb r4, [r9, r10]	
-				mov r5, #0
-				strb r5, [r8, r12]	@; fixem 0 a la posició visitada de mat_recomb1[][]
+					strb r4, [r9, r10]	
+					mov r5, #0
+					strb r5, [r8, r12]	@; fixem 0 a la posició visitada de mat_recomb1[][]
 
+					add r2, #1
+					add r10, #1
+					cmp r2, #COLUMNS
+					bne .lb_seguentcolumna
 
-				add r2, #1
-				add r10, #1
-				cmp r2, #COLUMNS
-				bne .lb_seguentcolumna
-
-				add r1, #1
-				cmp r1, #ROWS
-				bne .lb_seguentfila
+					add r1, #1
+					cmp r1, #ROWS
+					bne .lb_seguentfila
  
 		@; Còpia de mat_recomb2[][] a r0
 		mov r3, #0

@@ -361,7 +361,7 @@ int main(void)
 
 /* ---------------------------------------------------------------- */
 /* candy1_main.c : función principal main() para test de tarea 1F   */
-/*                     (sugiere_combinacion)                        */
+/*                     (baja_elementos)                        */
 /* ---------------------------------------------------------------- */
 
 int main(void)
