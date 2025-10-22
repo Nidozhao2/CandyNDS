@@ -319,6 +319,10 @@ baja_laterales:
 				add r1, #1 @; agafem el de adalt a la dreta
 				ldrb r9, [r4, r1]
 				cmp r7, #0
+				and r12, r9, #0x07
+				cmp r12, #7
+				cmpne r12, #0
+				addne r11, #2	@; r11=2 adalt-dreta es vàlid
 				beq .Lcheckaux
 				sub r1, #1
 
@@ -326,21 +330,18 @@ baja_laterales:
 				sub r1, #1	@; agafem el de adalt a la esquerra
 				ldrb r5, [r4, r1]
 				add r1, #1
-				.Lcheckaux:
-
 				and r12, r5, #0x07
 				cmp r12, #7
 				cmpne r12, #0
 				addne r11, #1	@; r11=1 adalt-esquerra es vàlid
+				
+				.Lcheckaux:
 
 				cmp r11, #1
 				cmpeq r7, #COLUMNS-1 @; si adalt-esquerra es vàlid i index_col == COLUMNS-1, baixem d'esquerra
 				beq .LbaixarEsquerra
 
-				and r12, r9, #0x07
-				cmp r12, #7
-				cmpne r12, #0
-				addne r11, #2	@; r11=2 adalt-dreta es vàlid
+
 				cmp r11, #2
 				cmpeq r7, #0	@; si adalt-dreta es vàlid i index_col == 0, baixem de dreta
 				beq .LbaixarDreta
