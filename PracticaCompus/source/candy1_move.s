@@ -316,14 +316,16 @@ baja_laterales:
 				beq .LcheckEsquerra
 
 				.LcheckDreta:
-				add r1, #2 @; agafem el de adalt a la dreta
+				add r1, #1 @; agafem el de adalt a la dreta
 				ldrb r9, [r4, r1]
 				cmp r7, #0
 				beq .Lcheckaux
+				sub r1, #1
+
 				.LcheckEsquerra:
 				sub r1, #1	@; agafem el de adalt a la esquerra
 				ldrb r5, [r4, r1]
-
+				add r1, #1
 				.Lcheckaux:
 
 				and r12, r5, #0x07
@@ -331,7 +333,6 @@ baja_laterales:
 				cmpne r12, #0
 				addne r11, #1	@; r11=1 adalt-esquerra es vàlid
 
-				sub r1, #1 @; retornem r1 a la posició inmediatament superior
 				cmp r11, #1
 				cmpeq r7, #COLUMNS-1 @; si adalt-esquerra es vàlid i index_col == COLUMNS-1, baixem d'esquerra
 				beq .LbaixarEsquerra
