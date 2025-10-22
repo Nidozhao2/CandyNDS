@@ -335,6 +335,7 @@ baja_laterales:
 				beq .LbaixarDreta
 
 
+
 				cmp r11, #0
 				beq .Lfi_bucle_lat	@; si cap es vàlid seguent iteració
 				cmp r11, #1
