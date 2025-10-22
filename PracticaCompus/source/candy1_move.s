@@ -158,9 +158,9 @@ baja_elementos:
 		push {r1- r12, lr}
 		mov r4, r0 @; conservem direcció de matriu de joc
 
-		bl baja_verticales
-		cmp r0, #0
-		bleq baja_laterales
+		//bl baja_verticales
+		//cmp r0, #0
+		bl baja_laterales
 
 		
 		pop {r1-r12, pc}
@@ -304,7 +304,7 @@ baja_laterales:
 			cmp r2, #7		@; si el imediatament superior és sòlid continuem
 			beq .LcheckDiagonals
 
-			and r2, #0x07
+		
 			cmp r2, #0
 			beq .LcheckDiagonals	@; si el inmediataments superior es buit també continuem
 			bne .Lfi_bucle_lat
@@ -365,6 +365,15 @@ baja_laterales:
 				moveq r8, #16
 				cmp r6, #0
 				moveq r8, #0
+
+				@; fix temporal?
+				//esto
+				mov r5, #COLUMNS
+				sub r5, r10, r5
+				ldrb r5, [r5]
+				cmp r5, #7
+				moveq r8, #7	
+				//
 				strb r8, [r4, r1]
 
 				mov r0, #1
@@ -391,7 +400,7 @@ baja_laterales:
 				moveq r8, #16
 				cmp r6, #0
 				moveq r8, #0
-				strb r8, [r4, r1]
+				strb r8, [r4, r1]   @; r4+r1=element superior
 				mov r0, #1
 				pop {r3,r6, r7}
 				b .Lfi_bucle_lat
