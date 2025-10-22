@@ -313,37 +313,36 @@ baja_laterales:
 				mov r11, #0 	@; r11 es el codi que diu si adalt-dreta/adalt-esquerra o els dos son vàlids
 
 				cmp r7, #COLUMNS-1
-				beq .LcheckEsquerra
+				beq .LcheckEsquerra @; no mirem dreta si index_col == COLUMNS-1
 
 				.LcheckDreta:
 				add r1, #1 @; agafem el de adalt a la dreta
 				ldrb r9, [r4, r1]
-				cmp r7, #0
+				sub r1, #1	@; retornem r1 a posició inmediatament superior
 				and r12, r9, #0x07
 				cmp r12, #7
 				cmpne r12, #0
 				addne r11, #2	@; r11=2 adalt-dreta es vàlid
-				beq .Lcheckaux
-				sub r1, #1
+				cmp r7, #0
+				beq .Lcheckaux	@; no mirem esquerra si index_col == 0
 
 				.LcheckEsquerra:
 				sub r1, #1	@; agafem el de adalt a la esquerra
 				ldrb r5, [r4, r1]
-				add r1, #1
+				add r1, #1	@; retornem r1 a posició inmediatament superior
 				and r12, r5, #0x07
 				cmp r12, #7
 				cmpne r12, #0
 				addne r11, #1	@; r11=1 adalt-esquerra es vàlid
-				
+
 				.Lcheckaux:
 
 				cmp r11, #1
-				cmpeq r7, #COLUMNS-1 @; si adalt-esquerra es vàlid i index_col == COLUMNS-1, baixem d'esquerra
+				cmpeq r7, #COLUMNS-1 @; si només adalt-esquerra es vàlid i index_col == COLUMNS-1, baixem d'esquerra
 				beq .LbaixarEsquerra
 
-
 				cmp r11, #2
-				cmpeq r7, #0	@; si adalt-dreta es vàlid i index_col == 0, baixem de dreta
+				cmpeq r7, #0	@; si només adalt-dreta es vàlid i index_col == 0, baixem de dreta
 				beq .LbaixarDreta
 
 				cmp r11, #0
