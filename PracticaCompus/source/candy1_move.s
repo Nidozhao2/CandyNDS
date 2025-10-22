@@ -158,8 +158,8 @@ baja_elementos:
 		push {r1- r12, lr}
 		mov r4, r0 @; conservem direcció de matriu de joc
 
-		//bl baja_verticales
-		//cmp r0, #0
+		bl baja_verticales
+		cmp r0, #0
 		bl baja_laterales
 
 		
@@ -349,7 +349,7 @@ baja_laterales:
 			.LbaixarEsquerra:
 				push {r3,r6, r7}
 
-				sub r1, #1 @; posició adalt-esquerra
+				
 				mov r7, r3, lsr #3
 				mov r6, r5, lsr #3
 				and r2, r5, #0x07
