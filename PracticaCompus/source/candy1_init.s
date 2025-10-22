@@ -86,7 +86,7 @@ inicializa_matriz:
 				add r0, r6 @; li afegim la gelatina
 
 				strb r0, [r7,r8]
-				mov r3, #0
+				mov r3, #2
 				
 				.Lcomprobar_repetits_init:
 
@@ -95,7 +95,7 @@ inicializa_matriz:
 					cmp r0, #3
 					bhs .Lgenerar_caramel
 					
-					cmp r3, #4
+					cmp r3, #3
 					addne r3, #1
 					bne .Lcomprobar_repetits_init
 		
