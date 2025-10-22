@@ -322,6 +322,8 @@ baja_laterales:
 				cmpne r12, #0
 				addne r11, #1	@; r11=1 adalt-esquerra es vàlid
 
+				sub r1, #1 @; retornem r1 a la posició inmediatament superior
+				
 				cmp r11, #1
 				cmpeq r7, #COLUMNS-1 @; si adalt-esquerra es vàlid i index_col == COLUMNS-1, baixem d'esquerra
 				beq .LbaixarEsquerra
@@ -334,7 +336,7 @@ baja_laterales:
 				cmpeq r7, #0	@; si adalt-dreta es vàlid i index_col == 0, baixem de dreta
 				beq .LbaixarDreta
 
-				sub r1, #1 @; retornem r1 a la posició inmediatament superior
+				
 				cmp r11, #0
 				beq .Lfi_bucle_lat	@; si cap es vàlid seguent iteració
 				cmp r11, #1
