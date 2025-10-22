@@ -444,7 +444,7 @@ void procesa_sugerencia(char mat[][COLUMNS], unsigned short lap)
 /* Programa principal: control general del juego */
 int main(void)
 {
-	unsigned char level = 4;		// nivel del juego (nivel inicial = 0)
+	unsigned char level = 0;		// nivel del juego (nivel inicial = 0)
 	short points = 0;				// contador de puntos
 	unsigned char moves = 0;		// número de movimientos restantes
 	unsigned char gelees = 0;		// número de gelatinas restantes
