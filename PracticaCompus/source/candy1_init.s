@@ -70,7 +70,7 @@ inicializa_matriz:
 				strb r6, [r7, r8] @; guardem el valor al mapa
 				mov r9, r6 @; per no perdre el valor
 
-				and r6, #0x07
+				and r6, #MASK_GEL
 				cmp r6, #0
 				bne .Lseguent_iteracio_init  @; en cas de que hi hagi un cero, hem de generar un caramel
 
@@ -146,8 +146,8 @@ recombina_elementos:
 
 		.Lcopia_matriu:
 			ldrb r4, [r7, r3]  	@; r4 = element de la matriu base per copiar
-			and r5, r4, #0x07	@; r5 = últims tres bits de l'element (element a copiar sense gelatines)
-			cmp r5, #0x07
+			and r5, r4, #MASK_GEL	@; r5 = últims tres bits de l'element (element a copiar sense gelatines)
+			cmp r5, #MASK_GEL
 			moveq r5, #0 		@; si l'element és solid o buit es guarda un 0
 			strb r5, [r8, r3] 	@; guardem l'element a la matriu mat_recomb1[][]
 
@@ -166,9 +166,9 @@ recombina_elementos:
 			.Lrecombinacio:
 				
 				ldrb r4, [r7,r10]
-				and r5, r4, #0x07
+				and r5, r4, #MASK_GEL
 
-				cmp r5, #0x07        @; si l'element de la matriu base és buida, forat o sòlid ignorem
+				cmp r5, #MASK_GEL        @; si l'element de la matriu base és buida, forat o sòlid ignorem
 				beq .Leshueco
 				cmp r5, #0
 				beq .Leshueco
