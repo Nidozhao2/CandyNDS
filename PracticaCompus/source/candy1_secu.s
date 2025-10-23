@@ -39,24 +39,24 @@
 @;		R0 = 1 si hay una secuencia, 0 en otro caso
 .global hay_secuencia
 hay_secuencia:
-		push {r1-r12,lr}
+		push {r1-r11,lr}
 		
 		mov r7, r0
-		mov r8, #0
+		mov r8, #0	@;inicialitzem indexos
 		mov r9, #0
 		.Lrecoregut:
-		mov r5, #0x07
+		mov r5, #MASK_CAR
 		mov r11 , r9
 		mov r10 , #COLUMNS
 		mul r11, r10
 		mov r10, r11
 		add r10, r8
-		ldrb r4, [r7, r10]
+		ldrb r4, [r7, r10]			@;carreguem el valor de la llaminadura adient
 		mov r3, r4
 		and r3, r5
-		cmp r3, #0 		@;buit
+		cmp r3, #VALOR_CERO 		@;buit
 		beq .LSeguentPosi
-		cmp r3, #7		@;solido, hueco
+		cmp r3, #VALOR_SOLID		@;solido, hueco
 		beq .LSeguentPosi
 
 		mov r6, #COLUMNS-2 @; anterior a la penultima
@@ -64,8 +64,8 @@ hay_secuencia:
 		movlo r0, r7
 		movlo r1, r9
 		movlo r2, r8
-		movlo r3, #0
-		bllo cuenta_repeticiones
+		movlo r3, #ESTE
+		bllo cuenta_repeticiones	@;comprovem que a la dreta té més de 2 llaminadures iguals
 		cmp r0, #2
 		bhi .Fi1	
 		
@@ -74,25 +74,25 @@ hay_secuencia:
 		movlo r0, r7
 		movlo r1, r9
 		movlo r2, r8
-		movlo r3, #1
-		bllo cuenta_repeticiones
+		movlo r3, #SUR
+		bllo cuenta_repeticiones		@;comprovem que a sota té més de 2 llaminadures iguals
 		cmp r0, #2
 		bhi .Fi1	
 
 		.LSeguentPosi:
 		cmp r8, #COLUMNS-1
-		addlo r8, #1
+		addlo r8, #1		@;incrementem l'index
 		addeq r9, #1
 		moveq r8, #0
 		cmpeq r9, #ROWS
 		blo .Lrecoregut
-		moveq r0, #0
+		moveq r0, #0	@;No ha trobat seqüència
 		beq .Fi
 
 		.Fi1:
-		mov r0, #1
+		mov r0, #1	@;Ha trobat seqüencia
 		.Fi:
-		pop {r1-r12,pc}
+		pop {r1-r11,pc}
 
 
 @;TAREA 1D;
@@ -110,7 +110,7 @@ hay_secuencia:
 elimina_secuencias:
 		push {r2-r12, lr}
 		ldr r7, =num_sec
-		mov r5, #0
+		mov r5, #VALOR_CERO
 		strb r5, [r7]			@;inicialitza num_sec
 		mov r7, r0
 		mov r5, r1
@@ -123,7 +123,7 @@ elimina_secuencias:
 		blo .Lelisec_for0
 		
 		bl marca_horizontales
-		mov r0, r7
+		mov r0, r7				@;Preparem paràmetres per a les 2 crides
 		mov r1, r5
 		bl marca_verticales
 		mov r0, r7
