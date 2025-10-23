@@ -31,57 +31,57 @@
 @;		R0 = 1 si hay una secuencia, 0 en otro caso
 	.global hay_combinacion
 hay_combinacion:
-		push {r1-r12,lr}
+		push {r2-r11,lr}
 		
 		mov r7, r0
 		mov r8, #0
-		mov r9, #0
+		mov r9, #0		@;Inicialitzacio de indexos
 		
 	.Lrecoregut:
-		mov r5, #0x07
+		mov r5, #MASK_CAR
 		mov r11 , r9
-		mov r10 , #COLUMNS
+		mov r10 , #COLUMNS	@;Obtenim l'offset
 		mul r11, r10
 		mov r10, r11
 		add r10, r8
-		ldrb r4, [r7, r10]
+		ldrb r4, [r7, r10]		@;Carreguem el primer valor
 		mov r3, r4
 		and r3, r5
-		cmp r3, #0 		@;buit
+		cmp r3, #VALOR_CERO 		@;buit
 		beq .LSeguentPosi
-		cmp r3, #7		@;solido, hueco
+		cmp r3, #VALOR_SOLID		@;solido, hueco
 		beq .LSeguentPosi
 	@; entrem a comprovar la fila
 		mov r6, #COLUMNS-1 @;la penultima
 		cmp r8, r6 
 		beq .LcomprovaROWS
 		add r10, #1
-		ldrb r6, [r7, r10]
+		ldrb r6, [r7, r10]		@;obtenim el valor de la següent posicio
 		sub r10, #1
 		mov r3, r6	
 		and r3, r5
-		cmp r3, #0 		@;buit
+		cmp r3, #VALOR_CERO 		@;buit
 		beq .LcomprovaROWS
 
-		cmp r3, #7		@;solido, hueco
+		cmp r3, #MASK_CAR		@;solido, hueco
 		beq .LcomprovaROWS
 
 		mov r2, r4
 		and r2, r5
-		cmp r3, R2
+		cmp r3, r2			@;comprovem si el primer valor i el segon son iguals, ignorant possibles gelatines
 		beq .LcomprovaROWS
 
-		add r10, #1
-		strb r4, [r7, r10] @;+1
+		add r10, #1		@;Realitzem intercanvis
+		strb r4, [r7, r10] @;offset +1
 		sub r10, #1
-		strb r6, [r7, r10] @;0
-		mov r0, r7
-		bl hay_secuencia
-		strb r4, [r7, r10] @;0
+		strb r6, [r7, r10] @;offset 0
+		mov r0, r7		@;Preparem variables
+		bl hay_secuencia		@;Mirem si havent realitzat l'intercanvi, es crea una seqüencia
+		strb r4, [r7, r10] @;offset 0
 		add r10, #1
-		strb r6, [r7, r10] @;+1
+		strb r6, [r7, r10] @;offset +1
 		sub r10, #1
-		cmp r0, #1
+		cmp r0, #1	@;Si ha trobat seqüencia, surt de la funcio
 		beq .Fi
 
 
@@ -92,36 +92,36 @@ hay_combinacion:
 
 		mov r11, #COLUMNS
 		add r10, r11
-		ldrb r6, [r7, r10]
+		ldrb r6, [r7, r10]			@;obtenim el valor de la següent posicio
 		sub r10, r11
 		mov r3, r6	
 		and r3, r5
-		cmp r3, #0 		@;buit
+		cmp r3, #VALOR_CERO 		@;buit
 		beq .LSeguentPosi
 
-		cmp r3, #7		@;solido, hueco
+		cmp r3, #VALOR_SOLID		@;solido, hueco
 		beq .LSeguentPosi
 
 		mov r2, r4
 		and r2, r5
-		cmp r3, R2
+		cmp r3, r2					@;comprovem si el primer valor i el segon son iguals, ignorant possibles gelatines
 		beq .LSeguentPosi
 
-		add r10, r11
+		add r10, r11		@;Realitzem intercanvis
 		strb r4, [r7, r10]
 		sub r10, r11
 		strb r6, [r7, r10]
-		mov r0, r7
-		bl hay_secuencia
+		mov r0, r7			@;Preparem variables
+		bl hay_secuencia		@;Mirem si havent realitzat l'intercanvi, es crea una seqüencia
 		strb r4, [r7, r10]
 		add r10, r11
 		strb r6, [r7, r10]
 		sub r10, r11
-		cmp r0, #1
+		cmp r0, #1			@;Si ha trobat seqüencia, surt de la funcio
 		beq .Fi
 
 	.LSeguentPosi:
-		cmp r8, #COLUMNS-1
+		cmp r8, #COLUMNS-1		@;Bucle amb el qual es recorre la matriu
 		addlo r8, #1
 		addeq r9, #1
 		moveq r8, #0
@@ -132,7 +132,7 @@ hay_combinacion:
 
 		
 	.Fi:
-		pop {r1-r12,pc}
+		pop {r2-r11,pc}
 
 
 
@@ -173,13 +173,13 @@ sugiere_combinacion:
 		add r3, r2	@;r3 es l'offset
 		ldrb r4, [r7, r3] @;r4 es el valor de la llaminadura a la posicio aleatoria
 		mov r5, r4
-		and r5, #0x07
-		cmp r5, #0				@;comprovem que no sigui ni buit ni un bloc solid, etc
+		and r5, #MASK_CAR
+		cmp r5, #VALOR_CERO				@;comprovem que no sigui ni buit ni un bloc solid, etc
 		beq .LSeguentPosicio
-		cmp r5, #7
+		cmp r5, #VALOR_SOLID
 		beq .LSeguentPosicio
 	
-		cmp r2, #0
+		cmp r2, #0				@;Comprovem si està a l'inici de la fila
 		beq .Lderechagen
 
 		@;si no està al limit per la dreta, comprovem el moviment de l'esquerra
@@ -188,25 +188,25 @@ sugiere_combinacion:
 		sub r3, #1
 		ldrb r5, [r7, r3] @;r5 es la llaminatura que es mou involuntariament
 		mov r6, r5
-		and r6, #0x07
-		cmp r6, #7		@;comprovem que no sigui bloc solid ni buit
-		addeq r3, #1
+		and r6, #MASK_CAR
+		cmp r6, #VALOR_SOLID		@;comprovem que no sigui bloc solid ni buit
+		addeq r3, #1		@;retornem l'offset a com estava
 		beq .Lderechagen
-		cmp r6, #0
+		cmp r6, #VALOR_CERO
 		addeq r3, #1
 		beq .Lderechagen
 
 
 		
 
-		strb r4, [r7, r3]
+		strb r4, [r7, r3]		@;Intercanviem posicions
 		add r3, #1
 		strb r5, [r7, r3]
 		
 		mov r4, r7
-		sub r2, #1
+		sub r2, #1			@;Preparem els paràmetres
 		bl detecta_orientacion
-		add r2, #1
+		add r2, #1		@;Retornem el valor dels paràmetres modificats per a fer la crida correctament
 		@;retornem la matriu a com estava
 		ldrb r5, [r7, r3]
 		sub r3, #1
@@ -219,7 +219,7 @@ sugiere_combinacion:
 		beq .Lderechagen
 
 		mov r9, r0 @;r9 es ori
-		mov r10, #0 @;r10 es cpi
+		mov r10, #0 @;r10 es cpi (esquerra)
 		b .Lcridagenerapos
 
 
@@ -231,23 +231,23 @@ sugiere_combinacion:
 		add r3, #1
 		ldrb r5, [r7, r3] @;r5 es la llaminadura que es mou involuntariament
 		mov r6, r5
-		and r6, #0x07
-		cmp r6, #7
-		subeq r3, #1
+		and r6, #MASK_CAR
+		cmp r6, #VALOR_SOLID			@;comprovem que no sigui bloc solid ni buit
+		subeq r3, #1		@;retornem l'offset a com estava
 		beq .Larribagen
-		cmp r6, #0
+		cmp r6, #VALOR_CERO
 		subeq r3, #1
 		beq .Larribagen
 
 		
-		strb r4, [r7, r3]
+		strb r4, [r7, r3]			@;Intercanviem posicions
 		sub r3, #1
 		strb r5, [r7, r3]
 		
 		mov r4, r7
-		add r2, #1
+		add r2, #1		@;Preparem els paràmetres
 		bl detecta_orientacion
-		sub r2, #1
+		sub r2, #1			@;Retornem el valor dels paràmetres modificats per a fer la crida correctament
 		@;retornem la matriu a com estava
 		ldrb r5, [r7, r3]
 		add r3, #1
@@ -259,37 +259,37 @@ sugiere_combinacion:
 		cmp r0, #6			@;Si no ha trobat cap direccio valida, seguent
 		beq .Larribagen
 		mov r9, r0 @;ori
-		mov r10, #1 @;cpi
+		mov r10, #1 @;cpi(Dreta)
 		b .Lcridagenerapos
 
 
 		@;ADALT
 		.Larribagen:
-		cmp r1, #0
+		cmp r1, #0		@;Comprovem que no estigui a l'inici de la fila
 		beq .Labajogen
 		ldrb r4, [r7, r3]
 		sub r3, #COLUMNS
-		ldrb r5, [r7, r3]
+		ldrb r5, [r7, r3]		@;r5 es la llaminadura que es mou involuntariament
 		mov r6, r5
-		and r6, #0x07	@;comprovem que no sigui solid ni buit
-		cmp r6, #7
+		and r6, #MASK_CAR	@;comprovem que no sigui solid ni buit
+		cmp r6, #VALOR_SOLID
+		addeq r3, #COLUMNS			@;retornem l'offset a com estava
+		beq .Labajogen
+		cmp r6, #VALOR_CERO
 		addeq r3, #COLUMNS
 		beq .Labajogen
-		cmp r6, #0
-		addeq r3, #COLUMNS
-		beq .Labajogen
 
 
 
 
-		strb r4, [r7, r3]
+		strb r4, [r7, r3]			@;Intercanviem posicions
 		add r3, #COLUMNS
 		strb r5, [r7, r3]
 
 		mov r4, r7
-		sub r1, #1
+		sub r1, #1		@;Preparem els paràmetres
 		bl detecta_orientacion
-		add r1, #1
+		add r1, #1				@;Retornem el valor dels paràmetres modificats per a fer la crida correctament
 		@;retornem la matriu a com estava
 		ldrb r5, [r7, r3]
 		sub r3, #COLUMNS
@@ -301,35 +301,35 @@ sugiere_combinacion:
 		cmp r0, #6
 		beq .Labajogen
 		mov r9, r0 @;ori
-		mov r10, #2 @;cpi
+		mov r10, #2 @;cpi(Adalt)
 		b .Lcridagenerapos
 
 		@;ABAIX
 		.Labajogen:
-		cmp r1, #ROWS-1
+		cmp r1, #ROWS-1		@;Comprovem que no estigui al final de les files
 		beq .LSeguentPosicio
 		ldrb r4, [r7, r3]
 		add r3, #COLUMNS
-		ldrb r5, [r7, r3]
+		ldrb r5, [r7, r3]		@;r5 es la llaminadura que es mou involuntariament
 		mov r6, r5
-		and r6, #0x07	@;comprovem que no sigui solid ni buit
-		cmp r6, #7
-		subeq r3, #COLUMNS
+		and r6, #MASK_CAR	@;comprovem que no sigui solid ni buit
+		cmp r6, #VALOR_SOLID
+		subeq r3, #COLUMNS			@;retornem l'offset a com estava
 		beq .LSeguentPosicio
-		cmp r6, #0
+		cmp r6, #VALOR_CERO
 		subeq r3, #COLUMNS
 		beq .LSeguentPosicio
 
 
 		
-		strb r4, [r7, r3]
+		strb r4, [r7, r3]		@;Intercanviem posicions
 		sub r3, #COLUMNS
 		strb r5, [r7, r3]
 
 		mov r4, r7
-		add r1, #1
+		add r1, #1			@;Preparem els paràmetres
 		bl detecta_orientacion
-		sub r1, #1
+		sub r1, #1			@;Retornem el valor dels paràmetres modificats per a fer la crida correctament
 		@;retornem la matriu a com estava
 		ldrb r5, [r7, r3]
 		add r3, #COLUMNS
@@ -341,7 +341,7 @@ sugiere_combinacion:
 		cmp r0, #6
 		beq .LSeguentPosicio
 		mov r9, r0 @;ori
-		mov r10, #3 @;cpi
+		mov r10, #3 @;cpi(Abaix)
 		b .Lcridagenerapos
 
 		.LSeguentPosicio:
@@ -360,11 +360,11 @@ sugiere_combinacion:
 
 
 		.Lcridagenerapos:
-		@;r9 es ori
-		@;r10 es cpi
-		@;r1 es fila
-		@;r2 es columna
-		@;r8 es el vect
+					@;r9 es ori
+					@;r10 es cpi
+					@;r1 es fila
+					@;r2 es columna
+					@;r8 es el vect
 		mov r0, r8
 		mov r3, r9
 		mov r4, r10
@@ -405,7 +405,7 @@ genera_posiciones:
 		strb r1, [r6]	@;y1
 		add r6, #1 @;ara r6 esta la direccio de x2
 		cmp r4, #1
-		blo .Lizquierda
+		blo .Lizquierda	@;Entrem a diferents línies depenent del codi de posicio inicial
 		beq .Lderecha
 		cmp r4, #3
 		blo .Larriba
@@ -431,7 +431,7 @@ genera_posiciones:
 		cmp r3, #1
 		blo .Leste
 		beq .Lsur
-		cmp r3, #3
+		cmp r3, #3		@;Entrem a diferents línies depenent del codi de orientacio
 		blo .Loeste
 		beq .Lnorte
 		cmp r3, #4
@@ -439,7 +439,7 @@ genera_posiciones:
 		
 		@;sino el vertical
 
-		.Lvertical:
+		.Lvertical:	@;Guardem els valors modificant els valors de la fila o columna depenent de les necessitats de cada codi d'orientacio
 
 		strb r2, [r6]
 		add r6, #1

@@ -108,7 +108,7 @@ hay_secuencia:
 @;		R1 = dirección de la matriz de marcas
 	.global elimina_secuencias
 elimina_secuencias:
-		push {r2-r12, lr}
+		push {r2-r8, lr}
 		ldr r7, =num_sec
 		mov r5, #VALOR_CERO
 		strb r5, [r7]			@;inicialitza num_sec
@@ -123,7 +123,7 @@ elimina_secuencias:
 		blo .Lelisec_for0
 		
 		bl marca_horizontales
-		mov r0, r7				@;Preparem paràmetres per a les 2 crides
+		mov r0, r7				@;Preparem paràmetres per a marca verticales
 		mov r1, r5
 		bl marca_verticales
 		mov r0, r7
@@ -131,19 +131,19 @@ elimina_secuencias:
 		
 
 
-		mov r3, #0
-		mov r5, #0
-		mov r6, #8
+		mov r3, #0			@;inicialitzem offset
+		mov r5, #VALOR_CERO
+		mov r6, #VALOR_GEL
 		mov r7, #ROWS
 		mov r4, #COLUMNS
 		mul r7, r4
 
 		.LDonaVoltes:
-		ldrb r4, [r1, r3]
-		cmp r4, #0
+		ldrb r4, [r1, r3]		@;Bucle per a intercanviar en 0 o gelatines
+		cmp r4, #VALOR_CERO
 		beq .LSeguirVoltejant
 		ldrb r4, [r0, r3]
-		cmp r4, #16
+		cmp r4, #VALOR_GEL_DOBLE
 		bhi .LStrhi
 		strb r5, [r0, r3]
 		b .LFiStrs
@@ -153,13 +153,13 @@ elimina_secuencias:
 
 
 		.LSeguirVoltejant:
-		add r3, #1
+		add r3, #1			@;Avança el index
 		cmp r3, r7
 		ble .LDonaVoltes
 
 
 
-		pop {r2-r12, pc}
+		pop {r2-r8, pc}
 
 
 	
@@ -189,7 +189,7 @@ marca_horizontales:
 		mov r8, #0  @;inicialitzem x i y
 		mov r9, #0
 		.LbucleHorizontal:
-		mov r5, #0x07
+		mov r5, #MASK_CAR
 		mov r11 , r9
 		mov r10 , #COLUMNS
 		mul r11, r10
@@ -198,26 +198,26 @@ marca_horizontales:
 		ldrb r4, [r7, r10]
 		mov r3, r4
 		and r3, r5
-		cmp r3, #0 		@;buit
+		cmp r3, #VALOR_CERO 		@;buit
 		beq .LSeguentPos
-		cmp r3, #7		@;solido, hueco
+		cmp r3, #VALOR_SOLID		@;solido, hueco
 		beq .LSeguentPos
-		push {r1}
-		mov r0, r7
+		push {r1}		@;Per optimitzar el flux del codi
+		mov r0, r7		@;Preparem els paràmetres
 		mov r1, r9
 		mov r2, r8
-		mov	r3, #0
+		mov	r3, #ESTE
 		bl cuenta_repeticiones
 		pop {r1}
-		mov r5, #0
-		cmp r0, #3
+		mov r5, #0			@;inicialitzem el comptador del bucle
+		cmp r0, #3			@;Comprovem si es una cadena de 3
 		blo .LSeguentPos
-		add r12, #1
+		add r12, #1			@;Index de la matriu de marques
 		.LBuclefor:
-		strb r12, [r1, r10]
+		strb r12, [r1, r10]	@;Guardem a la matriu de marques
 		add r10, #1
 		add r5, #1
-		cmp r5, r0
+		cmp r5, r0			@;Comprovem si falten llaminadures per a marcar
 		blo .LBuclefor
 		addeq r8, r0
 		subeq r8, #1
@@ -227,7 +227,7 @@ marca_horizontales:
 
 		.LSeguentPos:
 		cmp r8, #COLUMNS-1
-		addlo r8, #1
+		addlo r8, #1			@;Avancem en la matriu
 		addeq r9, #1
 		moveq r8, #0
 		cmpeq r9, #ROWS
@@ -265,7 +265,7 @@ marca_verticales:
 		mov r8, #0  @;inicialitzem x i y
 		mov r9, #0
 		.LbucleVertical:
-		mov r5, #0x07
+		mov r5, #MASK_CAR
 		mov r11 , r9
 		mov r10 , #COLUMNS
 		mul r11, r10
@@ -274,25 +274,25 @@ marca_verticales:
 		ldrb r4, [r7, r10]
 		mov r3, r4
 		and r3, r5
-		cmp r3, #0 		@;buit
+		cmp r3, #VALOR_CERO 		@;buit
 		beq .LSeguentPosV
-		cmp r3, #7		@;solido, hueco
+		cmp r3, #VALOR_SOLID		@;solido, hueco
 		beq .LSeguentPosV
-		push {r1}
-		mov r0, r7
+		push {r1}			@;Per optimitzar el flux del codi
+		mov r0, r7			@;Preparem els paràmetres
 		mov r1, r9
 		mov r2, r8
 		mov	r3, #1
 		bl cuenta_repeticiones
 		pop {r1}
 
-		mov r5, #0
-		cmp r0, #3
+		mov r5, #0				@;inicialitzem el comptador del bucle
+		cmp r0, #3				@;Comprovem si es una cadena de 3
 		blo .LSeguentPosV
 
 		mov r3, r10
-		.LBucle1rrecorregut:
-		ldrb r2, [r1, r3]
+		.LBucle1rrecorregut:	
+		ldrb r2, [r1, r3]		@;Comprovem si hi ha cap cadena horitzontal durant la vertical detectada
 		cmp r2, #0
 		bne .LAbansBucle
 		add r3, #COLUMNS
@@ -300,24 +300,24 @@ marca_verticales:
 		cmp r5, r0
 		blo .LBucle1rrecorregut
 
-		.LAbansBucle:
-		mov r5, #0
+		.LAbansBucle:		
+		mov r5, #0			@;Bucle per a obtenir el valor de la possible seqüència horitzontal detectada
 		cmp r2, #0
 		movne r3, r2
 		addeq r12, #1
 		moveq r3, r12
 		.LBuclefor2:
-		strb r3, [r1, r10]
+		strb r3, [r1, r10]	@;Guardem a la matriu de marques
 		add r10, #COLUMNS
 		add r5, #1
-		cmp r5, r0
+		cmp r5, r0			@;Comprovem si falten llaminadures per marcar
 		blo .LBuclefor2
 		
 		
 
 
 		.LSeguentPosV:
-		cmp r8, #COLUMNS
+		cmp r8, #COLUMNS				@;Avancem a la matriu
 		addlo r8, #1
 		blo .LbucleVertical
 		addeq r9, #1
@@ -328,7 +328,7 @@ marca_verticales:
 
 .LfinalV:
 		ldr r7, =num_sec
-		strb r12, [r7]
+		strb r12, [r7]			@;Retornem l'index de la matriu de marques
 		pop {r2-r12, pc}
 
 
