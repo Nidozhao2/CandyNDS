@@ -11,6 +11,39 @@
 
 
 
+MASK_GEL = 22 //15+7 
+OFFSET_COL=COLUMNS
+INDEX_COL=COLUMNS-1
+INDEX_ROWS=ROWS-1
+ESTE=0
+SUR=1
+OESTE=2
+NORTE=3
+CAP_DIR=0
+ESQUERRA=1
+DRETA=2
+DOS_DIR=3
+MASK_CAR =0x07 
+VALOR_CERO=0x0
+VALOR_GEL =0x08  //8 en decimal
+VALOR_GEL_DOBLE=0x10 //valor 16 en decimal
+VALOR_SOLID= 0x07
+VALOR_HUECO=0x0f //15 en decimal
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @;-- .text. código de las rutinas ---
 .text	
 		.align 2
@@ -41,100 +74,67 @@
 cuenta_repeticiones:
 		push {r1-r10,lr}
 
-
-
-
-		mov r4, #COLUMNS
-		mla r4, r1, r4, r2 
-
-		add r0, r0, r4
-
-		ldrb r4, [r0] 
-
-		mov r9, #7  @; carreguem la mascara 
-		and r4, r4, r9
-
-
 		mov r8, #1  @; r8 tenim el contador de repetits, mínim 1
 
+		mov r4, #COLUMNS
+		mla r4, r1, r4, r2  @; obtenim el offset valor que volem mirar
+		add r0, r0, r4  
+		ldrb r4, [r0]   @; per tant a r0 queda el valor de la posició (f,c)
 
-		@; per tant a r0 queda el valor de la posició (f,c)
+		mov r9, #MASK_CAR  @; carreguem la mascara 
+		and r4, r4, r9
 
-		cmp r3, #1  @; comparem amb 1 per extreure el casos de orientació propis dels valors 0 i 1
+		cmp r3, #ESTE  
+		beq .Leste
+		cmp r3, #SUR
 		beq .Lsur
-		blo .Leste
-		cmp r3, #2 @; comparemb amb 2 per extreure el cas de 2(oest), en cas contrari tenim el 3 (nord)
+		cmp r3, #OESTE
 		beq .Loeste
-		
+
+		//si no es cap es nord 
 		.Lnorte:
-		 
-
-
 		cmp r1, #0
 		beq .Lfi_cuenta
 		mov r7, r1  @; r7 fila
-		mov r5, #COLUMNS 
+		mov r5, #OFFSET_COL
 		rsb r5,r5,#0  @; r5 obté el offser per iteració 
-
 		b .Lcuenta_rep
 
 		.Leste:		
-
-
-
-		mov r6, #COLUMNS-1
-
-
+		mov r6, #INDEX_COL
 		sub r7, r6, r2 @;r7=numero de columnas menos columna actual
 		cmp r7, #0
 		beq .Lfi_cuenta 
-
 		mov r5, #1 @; r5 obté el offser per iteració 
-
-
 		b .Lcuenta_rep
 
 		.Lsur:
-
-
-		mov r6, #ROWS-1
+		mov r6, #INDEX_ROWS
 		sub r7, r6, r1
-
-
-		mov r5, #COLUMNS @; r5 obté el offser per iteració 
+		mov r5, #OFFSET_COL @; r5 obté el offser per iteració 
 		b .Lcuenta_rep
 
 		.Loeste:
-
 		mov r7, r2
 		cmp r2, #0
 		beq .Lfi_cuenta	
 		mov r5, #1  @; r5 obté el offser per iteració 	
 		rsb r5,r5, #0
 		
-	
 		.Lcuenta_rep:
 
 		add r0, r0, r5
 		ldrb r6, [r0]  @;el valor que estem comprovant es troba a r6
-
-
 		and r6, r6, r9  @; apliquem la mascara que ens compara els 3 bits inferiors
-
-
 		cmp r6, r4
 		addeq r8, #1
 		bne .Lfi_cuenta
-
-		
 		sub r7,#1
 		cmp r7, #0
 		bne .Lcuenta_rep
 
-
 		.Lfi_cuenta:
 		mov r0, r8 @; finalment retornem el resultat per r0
-
 
 		pop {r1-r10,pc}
 
